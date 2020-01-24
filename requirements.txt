@@ -1,0 +1,5 @@
+pyowm
+requests
+geopy
+pyTelegramBotAPI
+configparser
