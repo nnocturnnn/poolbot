@@ -1,7 +1,6 @@
 import telebot
 import time
 import pyowm
-import configparser
 import re
 import datetime
 import os
@@ -12,8 +11,6 @@ from geopy.geocoders import Nominatim
 
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 
-# config = configparser.ConfigParser()
-# config.read("config.ini")
 geolocator = Nominatim(user_agent="tusabot")
 bot = telebot.TeleBot(os.getenv("API_TELEGRAM"))
 keyboard1 = telebot.types.ReplyKeyboardMarkup()
