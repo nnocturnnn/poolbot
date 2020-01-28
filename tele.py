@@ -12,8 +12,8 @@ from geopy.geocoders import Nominatim
 
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 
-config = configparser.ConfigParser()
-config.read("config.ini")
+# config = configparser.ConfigParser()
+# config.read("config.ini")
 geolocator = Nominatim(user_agent="tusabot")
 bot = telebot.TeleBot(os.getenv("API_TELEGRAM"))
 keyboard1 = telebot.types.ReplyKeyboardMarkup()
@@ -24,10 +24,11 @@ key4 = telebot.types.KeyboardButton('геолока')
 key5 = telebot.types.KeyboardButton('платежи')
 key6 = telebot.types.KeyboardButton('бюджет')
 key7 = telebot.types.KeyboardButton('погодка')
+key8 = telebot.types.KeyboardButton('/я буду')
 keyboard1.row(key1, key2)
-keyboard1.row(key3, key4)
+keyboard1.row(key3, key8)
 keyboard1.row(key5, key6)
-keyboard1.row(key7)
+keyboard1.row(key7, key4)
 
 def date_sd():
     now = datetime.datetime.now()
@@ -172,11 +173,12 @@ def get_locate(message):
 	f.close()
 
 def get_who(message):
-	f = open('whobe.txt', 'w')
+	f = open('whobe.txt', 'a')
 	f.write(message.text)
 	f.close
 
-@bot.message_handler(commands = ['start', 'help', 'fullhelp', 'setinfo', '+', 'setlocate'])
+
+@bot.message_handler(commands = ['start', 'help', 'fullhelp', 'setinfo', '/я буду', 'setlocate'])
 def handle_start_help(message):
 	if message.text == "/start":
 		bot.send_message(message.chat.id, "Привет, чем я могу тебе помочь?", reply_markup=keyboard1)
@@ -188,9 +190,9 @@ def handle_start_help(message):
 	elif message.text == '/setinfo':
 		bot.send_message(message.chat.id, "А сейчас отправь инфу !")
 		bot.register_next_step_handler(message, get_info)
-	elif message.text == '/+':
-		bot.send_message(message.chat.id, "А сейчас отправь @человек_который_будет !")
-		whobe.append(message.split(' ', maxsplit = 1)[1])
+	elif message.text == '/я буду':
+		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
+		bot.register_next_step_handler(message, get_who)
 	elif message.text == '/setlocate':
 		bot.send_message(message.chat.id, "А сейчас отправь адрес !")
 		bot.register_next_step_handler(message, get_locate)
@@ -208,7 +210,10 @@ def main_option(message):
 		bot.send_message(message.chat.id, fd)
 		f.close()
 	elif message.text.lower() == 'кто будет?':
+		f = open('info.txt', 'r')
+		whobe = f.read()
 		bot.send_message(message.chat.id, whobe)
+		f.close()
 	elif message.text.lower() == 'геолока':
 		f = open('locate.txt', 'r')
 		adres = f.read()

@@ -1,5 +1,6 @@
-pyowm
-requests
-geopy
-pyTelegramBotAPI
-configparser
+pip==19.3.1
+lxml==4.4.2
+geopy==1.20.0
+pyowm==2.10.0
+pyTelegramBotAPI==3.6.6
+request==2.22.0
