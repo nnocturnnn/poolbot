@@ -10,18 +10,17 @@ from requests import post
 from geopy.geocoders import Nominatim
 
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
-
 geolocator = Nominatim(user_agent="tusabot")
-bot = telebot.TeleBot(os.getenv("API_TELEGRAM"))
+bot = telebot.TeleBot(os.getenv('API_TELEGRAM'))
 keyboard1 = telebot.types.ReplyKeyboardMarkup()
 key1 = telebot.types.KeyboardButton('дом инфо')
 key2 = telebot.types.KeyboardButton('инфо')
-key3 = telebot.types.KeyboardButton('кто будет ?')
+key3 = telebot.types.KeyboardButton('кто будет?')
 key4 = telebot.types.KeyboardButton('геолока')
 key5 = telebot.types.KeyboardButton('платежи')
 key6 = telebot.types.KeyboardButton('бюджет')
 key7 = telebot.types.KeyboardButton('погодка')
-key8 = telebot.types.KeyboardButton('/я буду')
+key8 = telebot.types.KeyboardButton('я буду')
 keyboard1.row(key1, key2)
 keyboard1.row(key3, key8)
 keyboard1.row(key5, key6)
@@ -46,7 +45,6 @@ def date_ed():
     edlist.reverse()
     ed = '.'.join(edlist)
     return ed
-
 
 def privat_bank_payment(password):
     sd = date_sd()
@@ -146,7 +144,7 @@ def privat_bank (password):
     return balance[0]
 
 def pogodka():
-	owm = pyowm.OWM(os.getenv("API_WEATHER"), language='ru')
+	owm = pyowm.OWM(os.getenv('API_WEATHER'), language='ru')
 	observation = owm.weather_at_place("Київ")
 	w = observation.get_weather()
 	temp = w.get_temperature('celsius')["temp"]
@@ -172,24 +170,20 @@ def get_locate(message):
 def get_who(message):
 	f = open('whobe.txt', 'a')
 	f.write(message.text)
+	f.write('\n')
 	f.close
 
 
-@bot.message_handler(commands = ['start', 'help', 'fullhelp', 'setinfo', '/я буду', 'setlocate'])
+@bot.message_handler(commands = ['start', 'help', 'setinfo', 'setlocate'])
 def handle_start_help(message):
 	if message.text == "/start":
 		bot.send_message(message.chat.id, "Привет, чем я могу тебе помочь?", reply_markup=keyboard1)
 	elif message.text == "/help":
 		bot.send_message(message.chat.id, "Вот список моих команд: " 
 				+ ', '.join(COMMANDS) + ". Просто напиши любую из них")
-	elif message.text == "/fullhelp":
-		bot.send_message(message.chat_id, "")
 	elif message.text == '/setinfo':
 		bot.send_message(message.chat.id, "А сейчас отправь инфу !")
 		bot.register_next_step_handler(message, get_info)
-	elif message.text == '/я буду':
-		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
-		bot.register_next_step_handler(message, get_who)
 	elif message.text == '/setlocate':
 		bot.send_message(message.chat.id, "А сейчас отправь адрес !")
 		bot.register_next_step_handler(message, get_locate)
@@ -199,28 +193,41 @@ def main_option(message):
 	if message.text.lower() == 'погодка':
 		bot.send_message(message.chat.id, pogodka())
 	elif message.text.lower() == 'бюджет':
-		bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
-		+ privat_bank(os.getenv("API_PRIVAT")) + " грувнев")
+		try:
+			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
+			+ privat_bank(os.getenv('API_PRIVAT')) + " грувнев")
+		except:
+			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+	elif message.text == 'я буду':
+		man = message.from_user.id
+		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
+		if man == message.from_user.id:
+			bot.register_next_step_handler(message, get_who)
 	elif message.text.lower() == 'инфо':
 		f = open('info.txt', 'r')
 		fd = f.read()
 		bot.send_message(message.chat.id, fd)
 		f.close()
 	elif message.text.lower() == 'кто будет?':
-		f = open('info.txt', 'r')
-		whobe = f.read()
-		bot.send_message(message.chat.id, whobe)
+		f = open('whobe.txt', 'r')
+		whobefd = f.read()
+		bot.send_message(message.chat.id, whobefd)
 		f.close()
 	elif message.text.lower() == 'геолока':
 		f = open('locate.txt', 'r')
-		adres = f.read()
-		location = geolocator.geocode(adres, language='ru')
-		bot.send_location(message.chat.id, location.latitude, location.longitude)
+		adresfd = f.read()
+		try:
+			location = geolocator.geocode(adresfd, language='ru')
+			bot.send_location(message.chat.id, location.latitude, location.longitude)
+		except:
+			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 		f.close()
 	elif message.text.lower() == 'платежи':
-		bot.send_message(message.chat.id, privat_bank_payment(os.getenv("API_PRIVAT")))
-	# elif message.text.lower() == 'дом инфа':
+		try:
+			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT')))
+		except:
+			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+	# elif message.text.lower() == 'дом инфо':
 	# 	bot.send_message(message.chat.id, house_info())
-
 
 bot.polling(none_stop=True)
