@@ -4,10 +4,12 @@ import pyowm
 import re
 import datetime
 import os
+import requests
 from xml.dom.minidom import parseString
 from hashlib import md5,sha1
 from requests import post
 from geopy.geocoders import Nominatim
+from telebot import apihelper
 
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 geolocator = Nominatim(user_agent="tusabot")
@@ -227,7 +229,9 @@ def main_option(message):
 			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT')))
 		except:
 			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
-	# elif message.text.lower() == 'дом инфо':
-	# 	bot.send_message(message.chat.id, house_info())
+	elif message.text.lower() == 'ip':
+		rer = requests.get('https://ramziv.com/ip').text
+		bot.send_message(message.chat.id, rer)
+
 
 bot.polling(none_stop=True)
