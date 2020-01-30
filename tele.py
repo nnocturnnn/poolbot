@@ -180,6 +180,8 @@ def get_who(message):
 def handle_start_help(message):
 	if message.text == "/start":
 		bot.send_message(message.chat.id, "Привет, чем я могу тебе помочь?", reply_markup=keyboard1)
+		f = open('whobe.txt', 'w')
+		f.close()
 	elif message.text == "/help":
 		bot.send_message(message.chat.id, "Вот список моих команд: " 
 				+ ', '.join(COMMANDS) + ". Просто напиши любую из них")
