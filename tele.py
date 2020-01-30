@@ -199,7 +199,7 @@ def main_option(message):
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
 			+ privat_bank(os.getenv('API_PRIVAT')) + " грувнев")
 		except:
-			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text == 'я буду':
 		man = message.from_user.id
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
@@ -222,13 +222,13 @@ def main_option(message):
 			location = geolocator.geocode(adresfd, language='ru')
 			bot.send_location(message.chat.id, location.latitude, location.longitude)
 		except:
-			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 		f.close()
 	elif message.text.lower() == 'платежи':
 		try:
 			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT')))
 		except:
-			bot.send.message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip').text
 		bot.send_message(message.chat.id, rer)
