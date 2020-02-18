@@ -11,9 +11,6 @@ from requests import post
 from geopy.geocoders import Nominatim
 from telebot import apihelper
 
-proxyDict = { 
-              "http"  : os.environ.get('FIXIE_URL', ''), 
-              "https" : os.environ.get('FIXIE_URL', '')}
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 geolocator = Nominatim(user_agent="tusabot")
 bot = telebot.TeleBot(os.getenv('API_TELEGRAM'))
@@ -51,7 +48,7 @@ def date_ed():
     ed = '.'.join(edlist)
     return ed
 
-def privat_bank_payment(password):
+def privat_bank_payment(password,proxyDict):
     sd = date_sd()
     ed = date_ed()
     url = "https://api.privatbank.ua/p24api/rest_fiz"
@@ -87,7 +84,7 @@ def privat_bank_payment(password):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxiest=proxyDict)
+    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
     dom = parseString(res.text)
     # # Парсинг платежейs
     finalprint = ''
@@ -106,7 +103,7 @@ def privat_bank_payment(password):
     
     return finalprint
 
-def privat_bank (password):
+def privat_bank (password,proxyDict):
 
     url = "https://api.privatbank.ua/p24api/balance"
 
@@ -140,7 +137,7 @@ def privat_bank (password):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxiest=proxyDict)
+    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
     dom = parseString(res.text)
     # Парсинг баланса
     balancetag = dom.getElementsByTagName('balance')[0].toxml()
@@ -197,12 +194,15 @@ def handle_start_help(message):
 
 @bot.message_handler(content_types = ['text'])
 def main_option(message):
+	proxyDict = { 
+			"http"  : os.environ.get('FIXIE_URL', ''), 
+			"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
 		bot.send_message(message.chat.id, pogodka())
 	elif message.text.lower() == 'бюджет':
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
-			+ privat_bank(os.getenv('API_PRIVAT')) + " грувнев")
+			+ privat_bank(os.getenv('API_PRIVAT'),proxyDict) + " грувнев")
 		except:
 			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text == 'я буду':
@@ -231,11 +231,11 @@ def main_option(message):
 		f.close()
 	elif message.text.lower() == 'платежи':
 		try:
-			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT')))
+			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict))
 		except:
 			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'ip':
-		rer = requests.get('https://ramziv.com/ip').text
+		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer)
 
 
