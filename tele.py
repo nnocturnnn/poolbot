@@ -11,6 +11,9 @@ from requests import post
 from geopy.geocoders import Nominatim
 from telebot import apihelper
 
+proxyDict = { 
+              "http"  : os.environ.get('FIXIE_URL', ''), 
+              "https" : os.environ.get('FIXIE_URL', '')}
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 geolocator = Nominatim(user_agent="tusabot")
 bot = telebot.TeleBot(os.getenv('API_TELEGRAM'))
@@ -84,7 +87,7 @@ def privat_bank_payment(password):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'})
+    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxiest=proxyDict)
     dom = parseString(res.text)
     # # Парсинг платежейs
     finalprint = ''
@@ -137,7 +140,7 @@ def privat_bank (password):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'})
+    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxiest=proxyDict)
     dom = parseString(res.text)
     # Парсинг баланса
     balancetag = dom.getElementsByTagName('balance')[0].toxml()
