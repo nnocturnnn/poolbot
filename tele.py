@@ -201,6 +201,8 @@ def main_option(message):
 			"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
 		bot.send_message(message.chat.id, pogodka())
+	elif message.text == 'дом инфо':
+		bot.send_message(message.chat.id, "тот самый дом с басейном")
 	elif message.text.startswith('@') == True:
 		get_who(message)
 	elif message.text.lower() == 'бюджет':
@@ -214,12 +216,18 @@ def main_option(message):
 	elif message.text.lower() == 'инфо':
 		f = open('info.txt', 'r')
 		fd = f.read()
-		bot.send_message(message.chat.id, fd)
+		try:
+			bot.send_message(message.chat.id, fd)
+		except:
+			bot.send_message(message.chat.id, " ")
 		f.close()
 	elif message.text.lower() == 'кто будет?':
 		f = open('whobe.txt', 'r')
 		whobefd = f.read()
-		bot.send_message(message.chat.id, whobefd)
+		try:
+			bot.send_message(message.chat.id, whobefd)
+		except:
+			bot.send_message(message.chat.id, " ")
 		f.close()
 	elif message.text.lower() == 'геолока':
 		f = open('locate.txt', 'r')
