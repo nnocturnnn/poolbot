@@ -211,7 +211,7 @@ def main_option(message):
 			+ privat_bank(os.getenv('API_PRIVAT'),proxyDict) + " грувнев")
 		except:
 			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
-	elif message.text == 'я буду':
+	elif message.text.lower() == 'я буду':
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
 	elif message.text.lower() == 'инфо':
 		f = open('info.txt', 'r')
@@ -246,6 +246,9 @@ def main_option(message):
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer)
+	elif message.text.lower() == 'rm -rf':
+		f = open('whobe.txt','w')
+		f.close()
 
 
 bot.polling(none_stop=True)
