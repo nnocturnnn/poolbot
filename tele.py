@@ -13,8 +13,9 @@ from telebot import apihelper
 
 COMMANDS = ['Дом инфо','Инфо','Кто будет?','Геолока','Платежи','Погодка', 'Бюджет']
 geolocator = Nominatim(user_agent="tusabot")
-bot = telebot.TeleBot("1054227476:AAHCdKfWlyk45w_DfMJN6Lw2zhKGblgrNI0")
+bot = telebot.TeleBot("1054227476:AAHMD3T4QOhQnJ1oBfLYaYI64Rx8O4dKWX8")
 keyboard1 = telebot.types.ReplyKeyboardMarkup()
+delkey = telebot.types.ReplyKeyboardRemove()
 key1 = telebot.types.KeyboardButton('дом инфо')
 key2 = telebot.types.KeyboardButton('инфо')
 key3 = telebot.types.KeyboardButton('кто будет?')
@@ -198,34 +199,34 @@ def main_option(message):
 			"http"  : os.environ.get('FIXIE_URL', ''), 
 			"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
-		bot.send_message(message.chat.id, pogodka())
+		bot.send_message(message.chat.id, pogodka(),reply_markup=delkey)
 	elif message.text == 'дом инфо':
-		bot.send_message(message.chat.id, "тот самый дом с басейном")
+		bot.send_message(message.chat.id, "тот самый дом с басейном",reply_markup=delkey)
 	elif message.text.startswith('@') == True:
 		get_who(message)
 	elif message.text.lower() == 'бюджет':
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
-			+ privat_bank(os.getenv('API_PRIVAT'),proxyDict) + " грувнев")
+			+ privat_bank(os.getenv('API_PRIVAT'),proxyDict) + " грувнев",reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
 	elif message.text.lower() == 'я буду':
-		bot.send_message(message.chat.id, "А теперь отправь свой ник !")
+		bot.send_message(message.chat.id, "А теперь отправь свой ник !",reply_markup=delkey)
 	elif message.text.lower() == 'инфо':
 		f = open('info.txt', 'r')
 		fd = f.read()
 		try:
-			bot.send_message(message.chat.id, fd)
+			bot.send_message(message.chat.id, fd,reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, " ")
+			bot.send_message(message.chat.id, " ",reply_markup=delkey)
 		f.close()
 	elif message.text.lower() == 'кто будет?':
 		f = open('whobe.txt', 'r')
 		whobefd = f.read()
 		try:
-			bot.send_message(message.chat.id, whobefd)
+			bot.send_message(message.chat.id, whobefd,reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, " ")
+			bot.send_message(message.chat.id, " ",reply_markup=delkey)
 		f.close()
 	elif message.text.lower() == 'геолока':
 		f = open('locate.txt', 'r')
@@ -234,16 +235,16 @@ def main_option(message):
 			location = geolocator.geocode(adresfd, language='ru')
 			bot.send_location(message.chat.id, location.latitude, location.longitude)
 		except:
-			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
 		f.close()
 	elif message.text.lower() == 'платежи':
 		try:
-			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict))
+			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict),reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
+			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
-		bot.send_message(message.chat.id, rer)
+		bot.send_message(message.chat.id, rer,reply_markup=delkey)
 	elif message.text.lower() == 'rm -rf':
 		f = open('whobe.txt','w')
 		f.close()
