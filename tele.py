@@ -181,7 +181,7 @@ def get_who(message):
 
 @bot.message_handler(commands = ['start', 'help', 'setinfo', 'setlocate'])
 def handle_start_help(message):
-	if message.text == "/start":
+	if message.text.startswith('/start') == True:
 		bot.send_message(message.chat.id, "Привет, чем я могу тебе помочь?", reply_markup=keyboard1)
 	elif message.text == "/help":
 		bot.send_message(message.chat.id, "Вот список моих команд: " 
