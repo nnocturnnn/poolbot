@@ -171,12 +171,16 @@ def get_locate(message):
 	f.close()
 
 def get_who(message):
-	if message.text.startswith('@'):
-		print(1)
-		f = open('whobe.txt', 'a')
-		f.write(message.text)
-		f.write('\n')
-		f.close
+	if not " " in message.text:
+		q = open('whobe.txt', 'r')
+		alltext = q.read()
+		if not message.text in alltext:
+			q.close()
+			if message.text.startswith('@'):
+				f = open('whobe.txt', 'a')
+				f.write(message.text)
+				f.write('\n')
+				f.close()
 
 
 @bot.message_handler(commands = ['start', 'help', 'setinfo', 'setlocate'])
@@ -218,7 +222,7 @@ def main_option(message):
 		try:
 			bot.send_message(message.chat.id, fd,reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, " ",reply_markup=delkey)
+			bot.send_message(message.chat.id, "поставь инфо пидор /setinfo",reply_markup=delkey)
 		f.close()
 	elif message.text.lower() == 'кто будет?':
 		f = open('whobe.txt', 'r')
@@ -226,7 +230,7 @@ def main_option(message):
 		try:
 			bot.send_message(message.chat.id, whobefd,reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, " ",reply_markup=delkey)
+			bot.send_message(message.chat.id, "Никого",reply_markup=delkey)
 		f.close()
 	elif message.text.lower() == 'геолока':
 		f = open('locate.txt', 'r')
