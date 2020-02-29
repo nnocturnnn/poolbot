@@ -142,7 +142,7 @@ def privat_bank (password,proxyDict):
     dom = parseString(res.text)
     # Парсинг баланса
     balancetag = dom.getElementsByTagName('balance')[0].toxml()
-    balance = re.findall(r'\d.\d{2}',balancetag)
+    balance = re.findall(r'[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?',balancetag)
 
     return balance[0]
 
