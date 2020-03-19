@@ -49,7 +49,7 @@ def date_ed():
     ed = '.'.join(edlist)
     return ed
 
-def privat_bank_payment(password,proxyDict):
+def privat_bank_payment(password,proxyDict, idi):
     sd = date_sd()
     ed = date_ed()
     url = "https://api.privatbank.ua/p24api/rest_fiz"
@@ -57,8 +57,8 @@ def privat_bank_payment(password,proxyDict):
     head = """<?xml version="1.0" encoding="UTF-8"?>
     <request version="1.0">
     <merchant>
-        <id>153753</id>
-        <signature>"""
+        <id>%s</id>
+        <signature>""" % idi
 
     data = """<oper>cmt</oper>
         <wait>0</wait>
@@ -104,15 +104,15 @@ def privat_bank_payment(password,proxyDict):
     
     return finalprint
 
-def privat_bank (password,proxyDict):
+def privat_bank (password,proxyDict,idi):
 
     url = "https://api.privatbank.ua/p24api/balance"
 
     head = """<?xml version="1.0" encoding="UTF-8"?>
     <request version="1.0">
     <merchant>
-        <id>153753</id>
-        <signature>"""
+        <id>%s</id>
+        <signature>""" % idi
 
     data = """<oper>cmt</oper>
         <wait>0</wait>
@@ -152,7 +152,7 @@ def pogodka():
 	w = observation.get_weather()
 	temp = w.get_temperature('celsius')["temp"]
 
-	pogodka = ("В Кийове сейчас : " + w.get_detailed_status() 
+	pogodka = ("На тусовочке будет : " + w.get_detailed_status() 
 			+ "\nТемпература около : " + str(temp) + " градусов")
 	return pogodka
 
@@ -211,9 +211,10 @@ def main_option(message):
 	elif message.text.lower() == 'бюджет':
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
-			+ privat_bank(os.getenv('API_PRIVAT'),proxyDict) + " грувнев",reply_markup=delkey)
+			+ privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753") + " грувнев",reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
+            bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " 
+			+ privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
 	elif message.text.lower() == 'я буду':
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !",reply_markup=delkey)
 	elif message.text.lower() == 'инфо':
@@ -243,9 +244,9 @@ def main_option(message):
 		f.close()
 	elif message.text.lower() == 'платежи':
 		try:
-			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict),reply_markup=delkey)
+			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict, "153753"),reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
+            bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325"),reply_markup=delkey)
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer,reply_markup=delkey)
