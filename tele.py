@@ -212,7 +212,7 @@ def main_option(message):
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753") + " грувнев",reply_markup=delkey)
 		except:
-            bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
+			ot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
 	elif message.text.lower() == 'я буду':
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !",reply_markup=delkey)
 	elif message.text.lower() == 'инфо':
@@ -244,7 +244,7 @@ def main_option(message):
 		try:
 			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict, "153753"),reply_markup=delkey)
 		except:
-            bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325"),reply_markup=delkey)
+			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325"),reply_markup=delkey)
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer,reply_markup=delkey)
