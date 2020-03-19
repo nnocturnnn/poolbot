@@ -212,7 +212,7 @@ def main_option(message):
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753") + " грувнев",reply_markup=delkey)
 		except:
-			ot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
+			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
 	elif message.text.lower() == 'я буду':
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !",reply_markup=delkey)
 	elif message.text.lower() == 'инфо':
