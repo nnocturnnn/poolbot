@@ -205,14 +205,17 @@ def main_option(message):
 	if message.text.lower() == 'погодка':
 		bot.send_message(message.chat.id, pogodka(),reply_markup=delkey)
 	elif message.text == 'дом инфо':
-		bot.send_message(message.chat.id, "тот самый дом с басейном",reply_markup=delkey)
+		bot.send_message(message.chat.id, "https://apartila.com/offer/posutocheo_kottedzh_bez_komissii-1428",reply_markup=delkey)
 	elif message.text.startswith('@') == True:
 		get_who(message)
 	elif message.text.lower() == 'бюджет':
 		try:
 			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753") + " грувнев",reply_markup=delkey)
 		except:
-			bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
+			try:
+				bot.send_message(message.chat.id, "Бюджет тусовочки 💴 💴 💴 " + privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325") + " грувнев",reply_markup=delkey)
+			except:
+				bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔',reply_markup=delkey)
 	elif message.text.lower() == 'я буду':
 		bot.send_message(message.chat.id, "А теперь отправь свой ник !",reply_markup=delkey)
 	elif message.text.lower() == 'инфо':
