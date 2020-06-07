@@ -40,29 +40,30 @@ keyboard1.row(key9, key10)
 def terminal(message):
     message = message.text
     global q
-    if message.startswith('&'):
-        message += ' Киев' 
-        url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
-        req = requests.get(url).json()
-        location = geolocator.geocode(message, language='ru')
-        if location is not None:
-            lat = location.latitude
-            lon = location.longitude
-            A = [(lat, lon)]
-            list_cord = []
+    if message is not None:
+        if message.startswith('&'):
+            message += ' Киев' 
+            url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
+            req = requests.get(url).json()
+            location = geolocator.geocode(message, language='ru')
+            if location is not None:
+                lat = location.latitude
+                lon = location.longitude
+                A = [(lat, lon)]
+                list_cord = []
 
-            for i in range(len(req['devices'])):
-                lon_d = float(req['devices'][i]['latitude'])
-                lat_d = float(req['devices'][i]['longitude'])
-                B = (lat_d,lon_d)
-                list_cord.append(B)
-            
-            distance,index = spatial.KDTree(list_cord).query(A)
-            with open('term.txt', 'w') as f:
-                f.write(str(list_cord[index[0]][0]))
-                f.write(' ')
-                f.write(str(list_cord[index[0]][1]))
-            q = True
+                for i in range(len(req['devices'])):
+                    lon_d = float(req['devices'][i]['latitude'])
+                    lat_d = float(req['devices'][i]['longitude'])
+                    B = (lat_d,lon_d)
+                    list_cord.append(B)
+                
+                distance,index = spatial.KDTree(list_cord).query(A)
+                with open('term.txt', 'w') as f:
+                    f.write(str(list_cord[index[0]][0]))
+                    f.write(' ')
+                    f.write(str(list_cord[index[0]][1]))
+                q = True
 
             
 
