@@ -129,6 +129,8 @@ def privat_bank_payment(password,proxyDict, idi):
     # # Парсинг платежейs
     finalprint = ''
     payment = dom.getElementsByTagName('statement')
+    leny = len(payment)
+    i = 0
     for pay in payment:
         finalprint += ' 💳 💳 💳 '
         finalprint += pay.getAttribute('trandate')
@@ -140,6 +142,8 @@ def privat_bank_payment(password,proxyDict, idi):
         except:
             finalprint += ' '
         finalprint += '\n'
+        if i == leny // 2:
+            finalprint += '*'
     
     fp = ''
     for pay in payment:
@@ -325,14 +329,11 @@ def main_option(message):
 	elif message.text.lower() == 'платежи':
 		try:
 			pri = privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict, "153753")
-			pri_list = pri.split('\n')
-			for i in pri_list:
-				bot.send_message(message.chat.id, i ,reply_markup=delkey)
 		except:
 			pri = privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325")
-			pri_list = pri.split('\n')
-			for i in pri_list:
-				bot.send_message(message.chat.id, i ,reply_markup=delkey)
+		pri_list = pri.split('\n')
+		for i in pri_list:
+			bot.send_message(message.chat.id, i ,reply_markup=delkey)
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer,reply_markup=delkey)
