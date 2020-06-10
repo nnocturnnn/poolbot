@@ -324,9 +324,12 @@ def main_option(message):
 		f.close()
 	elif message.text.lower() == 'платежи':
 		try:
-			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict, "153753"),reply_markup=delkey)
+			pri = privat_bank_payment(os.getenv('API_PRIVAT'),proxyDict, "153753")
 		except:
-			bot.send_message(message.chat.id, privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325"),reply_markup=delkey)
+			pri = privat_bank_payment(os.getenv('API_PRIVAT2'),proxyDict, "155325")
+		pri_list = pri.split('\n')
+		for i in pri_list:
+			bot.send_message(message.chat.id, i ,reply_markup=delkey)
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		bot.send_message(message.chat.id, rer,reply_markup=delkey)
