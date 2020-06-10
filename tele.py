@@ -276,7 +276,7 @@ def main_option(message):
 	if message.text.lower() == 'погодка':
 		# bot.send_message(message.chat.id, pogodka(),reply_markup=delkey)
 		bot.send_message(message.chat.id , "На тусовочке будет : ясно"
-			+ "\nТемпература около : 24.5 градусов",reply_markup=delkey)
+			+ "\nТемпература около : 32.5 градусов",reply_markup=delkey)
 	elif message.text == 'дом инфо':
 		f = open('home.txt', 'r')
 		fd = f.read()
