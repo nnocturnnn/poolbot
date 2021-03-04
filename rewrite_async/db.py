@@ -11,3 +11,11 @@ def start_db():
                 list_user TEXT);
                 """)
     conn.commit()
+
+
+def insert_db(chat_id ):
+    conn = sqlite3.connect('bots.db')
+    cur = conn.cursor()
+    user = ('00002', 'Lois', 'Lane', 'Female')
+    cur.executemany("INSERT INTO users VALUES(?, ?, ?, ?);", user)
+    conn.commit()
