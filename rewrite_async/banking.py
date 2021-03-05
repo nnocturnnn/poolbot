@@ -1,3 +1,25 @@
+import requests
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+geolocator = Nominatim(user_agent="tusabot")
+
+
+url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
+req = requests.get(url).json()
+location = geolocator.geocode("Киев Боголюбова 39", language='ru')
+addres_lat_lon = (location.latitude, location.longitude)
+list_cord = []
+list_meters = []
+for i in range(len(req['devices'])):
+    lon_d = float(req['devices'][i]['latitude'])
+    lat_d = float(req['devices'][i]['longitude'])
+    all_lat_lon = (lat_d,lon_d)
+    list_cord.append(all_lat_lon)
+for i in list_cord:
+    list_meters.append(geodesic(addres_lat_lon, all_lat_lon).meters)
+min_meter = min(list_meters)
+
+
 
 def terminal(message):
     message = message.text
