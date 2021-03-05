@@ -16,9 +16,10 @@ for i in range(len(req['devices'])):
     all_lat_lon = (lat_d,lon_d)
     list_cord.append(all_lat_lon)
 for i in list_cord:
-    list_meters.append(geodesic(addres_lat_lon, all_lat_lon).meters)
+    list_meters.append(geodesic(addres_lat_lon, i).meters)
 min_meter = min(list_meters)
-
+print(req['devices'][list_meters.index(min_meter)])
+print(int(min_meter))
 
 
 def terminal(message):
