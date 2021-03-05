@@ -1,7 +1,10 @@
 import requests
 import datetime
+import re
+from hashlib import md5,sha1
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+from xml.dom.minidom import parseString
 
 geolocator = Nominatim(user_agent="tusabot")
 
@@ -25,7 +28,6 @@ def get_near_terminal(message):
     ret_str = f"К близжайшему терминалу {min_meter} м. он в {need_device['placeRu']}"
     addres_lat_lon = (need_device['latitude'],need_device['longitude'])
     return ret_str, addres_lat_lon
-
 
 def date_sd():
     time_now = datetime.datetime.now() - datetime.timedelta(days=30)
@@ -74,7 +76,7 @@ def privat_bank_payment(password,proxyDict, idi):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
+    res = requests.post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
     dom = parseString(res.text)
     # # Парсинг платежейs
     finalprint = ''
@@ -144,7 +146,7 @@ def privat_bank (password,proxyDict,idi):
     data_done = head + signature_done + end_head + data + footer
 
     # === Запрос
-    res = post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
+    res = requests.post(url, data=data_done, headers={'Content-Type': 'application/xml; charset=UTF-8'}, proxies=proxyDict)
     dom = parseString(res.text)
     # Парсинг баланса
     balancetag = dom.getElementsByTagName('balance')[0].toxml()
