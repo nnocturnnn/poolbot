@@ -1,76 +1,41 @@
 import requests
+import datetime
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+
 geolocator = Nominatim(user_agent="tusabot")
 
+def get_near_terminal(message):
+    url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
+    req = requests.get(url).json()
+    location = geolocator.geocode("Киев Боголюбова 39", language='ru')
+    addres_lat_lon = (location.latitude, location.longitude)
+    list_cord = []
+    list_meters = []
+    for i in range(len(req['devices'])):
+        lon_d = float(req['devices'][i]['latitude'])
+        lat_d = float(req['devices'][i]['longitude'])
+        all_lat_lon = (lat_d,lon_d)
+        list_cord.append(all_lat_lon)
 
-url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
-req = requests.get(url).json()
-location = geolocator.geocode("Киев Боголюбова 39", language='ru')
-addres_lat_lon = (location.latitude, location.longitude)
-list_cord = []
-list_meters = []
-for i in range(len(req['devices'])):
-    lon_d = float(req['devices'][i]['latitude'])
-    lat_d = float(req['devices'][i]['longitude'])
-    all_lat_lon = (lat_d,lon_d)
-    list_cord.append(all_lat_lon)
-for i in list_cord:
-    list_meters.append(geodesic(addres_lat_lon, i).meters)
-min_meter = min(list_meters)
-print(req['devices'][list_meters.index(min_meter)])
-print(int(min_meter))
+    for i in list_cord:
+        list_meters.append(geodesic(addres_lat_lon, i).meters)
+    min_meter = min(list_meters)
+    need_device = req['devices'][list_meters.index(min_meter)]
+    ret_str = f"К близжайшему терминалу {min_meter} м. он в {need_device['placeRu']}"
+    addres_lat_lon = (need_device['latitude'],need_device['longitude'])
+    return ret_str, addres_lat_lon
 
-
-def terminal(message):
-    message = message.text
-    global q
-    if message is not None:
-        if message.startswith('&'):
-            message += ' Киев' 
-            url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
-            req = requests.get(url).json()
-            location = geolocator.geocode(message, language='ru')
-            if location is not None:
-                lat = location.latitude
-                lon = location.longitude
-                A = [(lat, lon)]
-                list_cord = []
-
-                for i in range(len(req['devices'])):
-                    lon_d = float(req['devices'][i]['latitude'])
-                    lat_d = float(req['devices'][i]['longitude'])
-                    B = (lat_d,lon_d)
-                    list_cord.append(B)
-                
-                distance,index = spatial.KDTree(list_cord).query(A)
-                with open('term.txt', 'w') as f:
-                    f.write(str(list_cord[index[0]][0]))
-                    f.write(' ')
-                    f.write(str(list_cord[index[0]][1]))
-                q = True
-
-            
 
 def date_sd():
-    now = datetime.datetime.now()
-    month = now.month - 1
-    year = now.year
-    if month == 0:
-        month = 12
-        year -= 1
-    sd = str(now.day) + '.'
-    if month < 10:
-        sd += '0' 
-    sd += str(month) + '.' + str(year)
-    return sd
+    time_now = datetime.datetime.now() - datetime.timedelta(days=30)
+    str_time = time_now.strftime("%m.%d.%Y")
+    return str_time
 
 def date_ed():
-    now = str(datetime.datetime.now()).split()[0]
-    edlist = now.split('-')
-    edlist.reverse()
-    ed = '.'.join(edlist)
-    return ed
+    time_now = datetime.datetime.now()
+    str_time = time_now.strftime("%m.%d.%Y")
+    return str_time
 
 
 def privat_bank_payment(password,proxyDict, idi):
