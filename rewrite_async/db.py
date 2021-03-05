@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def start_db():
     conn = sqlite3.connect('bots.db')
     cur = conn.cursor()
@@ -13,9 +12,9 @@ def start_db():
     conn.commit()
 
 
-def insert_db(chat_id ):
+def insert_db(chat_id,locale,info,list_user):
     conn = sqlite3.connect('bots.db')
     cur = conn.cursor()
-    user = ('00002', 'Lois', 'Lane', 'Female')
+    user = (chat_id, locale, info, list_user)
     cur.executemany("INSERT INTO users VALUES(?, ?, ?, ?);", user)
     conn.commit()

@@ -1,5 +1,6 @@
 import logging
 import banking
+import db
 
 from aiogram import Bot, Dispatcher, executor, types
 
