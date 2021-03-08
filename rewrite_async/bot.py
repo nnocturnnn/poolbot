@@ -8,6 +8,7 @@ import os
 from aiogram import Bot, Dispatcher, executor, types
 
 API_TOKEN = '1054227476:AAHMD3T4QOhQnJ1oBfLYaYI64Rx8O4dKWX8'        # TODO убрать в проде
+SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
