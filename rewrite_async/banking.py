@@ -11,7 +11,7 @@ geolocator = Nominatim(user_agent="tusabot")
 def get_near_terminal(message):
     url = 'https://api.privatbank.ua/p24api/infrastructure?json&tso&address=&city=%s' % ('Киев')    
     req = requests.get(url).json()
-    location = geolocator.geocode("Киев Боголюбова 39", language='ru')
+    location = geolocator.geocode(message, language='ru')
     addres_lat_lon = (location.latitude, location.longitude)
     list_cord = []
     list_meters = []
@@ -112,7 +112,7 @@ def privat_bank_payment(password,proxyDict, idi):
     
     return finalprint
 
-def privat_bank (password,proxyDict,idi):
+def privat_bank (password,proxyDict,idi,card):
 
     url = "https://api.privatbank.ua/p24api/balance"
 
@@ -126,9 +126,9 @@ def privat_bank (password,proxyDict,idi):
         <wait>0</wait>
         <test>0</test>
         <payment id="">
-        <prop name="cardnum" value="5168745302334229" />
+        <prop name="cardnum" value="%s" />
         <prop name="country" value="UA" />
-        </payment>"""
+        </payment>""" % card
 
     end_head = """</signature>
     </merchant>
