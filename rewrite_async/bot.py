@@ -134,3 +134,6 @@ async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Наличные \
 		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
+
+if __name__ == '__main__':
+	executor.start_polling(dp, skip_updates=True)
