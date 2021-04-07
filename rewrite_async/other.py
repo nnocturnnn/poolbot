@@ -12,3 +12,4 @@ def pogodka():
 	return pogodka
 
 def get_mp4():
+	pass

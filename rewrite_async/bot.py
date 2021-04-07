@@ -7,7 +7,7 @@ import os
 
 from aiogram import Bot, Dispatcher, executor, types
 
-API_TOKEN = '1054227476:AAHMD3T4QOhQnJ1oBfLYaYI64Rx8O4dKWX8'        # TODO убрать в проде
+API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
 SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
 
@@ -87,11 +87,8 @@ async def send_text(message: types.Message):
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		await message.answer(rer)
 	elif message.text.lower() == 'playmusic':
-		
-	
+		pass
 
-	
-	
 
 @dp.callback_query_handler(lambda c: c.data == 'btn1')
 async def process_callback_button1(callback_query: types.CallbackQuery):
@@ -124,16 +121,16 @@ async def process_callback_private(callback_query: types.CallbackQuery):
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Приватбанк \
-		, теперь отправьте {} гривен на {} подождите после отправки 1 минуту и нажмите Проверить')
+		, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'mono_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Приватбанк \
-		, теперь отправьте {} гривен на {} подождите после отправки 1 минуту и нажмите Проверить')
+		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Монобанк \
+		, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'nal_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Наличные \
-		, теперь отправьте {} гривен на {} или на {} подождите после отправки 1 минуту и нажмите Проверить')
+		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
