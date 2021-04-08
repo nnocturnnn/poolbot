@@ -25,10 +25,10 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
         cur.executemany("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?);", user)
     elif locale != "none":
         sql = """UPDATE ListMembers SET locale = %s WHERE chat_id = %s"""
-        cur.execute(sql, (locale, chat_id))
+        cur.execute(sql, (locale , chat_id))
     elif info != "none":
-        sql = """UPDATE ListMembers SET info = %s WHERE chat_id = %s"""
-        cur.execute(sql, (locale, chat_id))
+        sql = """UPDATE users SET info = ? WHERE chat_id = ?"""
+        cur.execute(sql, (info, chat_id))
     elif list_user != "none":
         sql = """UPDATE ListMembers SET list_user = %s WHERE chat_id = %s"""
         cur.execute(sql, (locale, chat_id))
@@ -47,13 +47,14 @@ def get_from_db(chat_id,message):
     conn = sqlite3.connect('bots.db')
     cur = conn.cursor()
     if message == "info":
-        sql = """SELECT info WHERE chat_id = %s"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT info FROM users WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
+        print(cur.fetchall())
     elif message == "date":
         sql = """SELECT date WHERE chat_id = %s"""
         cur.execute(sql, (chat_id))
     elif message == "locale":
-        sql = """SELECT locale WHERE chat_id = %s"""
+        sql = """SELECT locale WHERE chat_id = ?"""
         cur.execute(sql, (chat_id))
     elif message == "price":
         sql = """SELECT price WHERE chat_id = %s"""

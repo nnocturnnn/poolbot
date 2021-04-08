@@ -21,9 +21,9 @@ async def send_command(message: types.Message):
 		await message.answer( f'{message.from_user.first_name} , добро \
 		пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
 	elif message.text.lower() == "/help":
-		await message.answer("Этот бот поможет организовать тусовочку\n \
-		/setinfo - установить информацию тусовочки\n/setlocale - установить место\n \
-		/setdate - установить дату\n/setprice - установить цену\n/setcardinfo \
+		await message.answer("Этот бот поможет организовать тусовочку\n\
+/setinfo - установить информацию тусовочки\n/setlocale - установить место\n\
+/setdate - установить дату\n/setprice - установить цену\n/setcardinfo \
 		- установить автопроверку платежей (Monobank, PrivatBank)")
 	elif message.text.lower() == "/setinfo":
 		await message.answer("А теперь отправь информацию о тусовочке!")
@@ -50,7 +50,7 @@ async def send_text(message: types.Message):
 	if message.text.lower() == 'погодка':
 		await message.answer(other.pogodka())
 	elif message.text.lower() == 'инфо':
-		await message.answer(db.get_from_db("info"))
+		await message.answer(db.get_from_db(str(message.from_user.id),"info"))
 	elif message.text.lower() == 'кто будет?':
 		await message.answer(db.get_from_db("list_user"))
 	elif message.text.lower() == 'кто скинул?':
@@ -136,4 +136,5 @@ async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 if __name__ == '__main__':
+	db.start_db()
 	executor.start_polling(dp, skip_updates=True)
