@@ -25,18 +25,41 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot,storage=MemoryStorage())
 
-@dp.message_handler(state=Test.info | Test.locale | Test.date | Test.price | Test.cardinfo)
-async def db_state(message: types.Message, state: FSMContext):
-	if Test.info:
-		answer = message.text
-		db.insert_db(message.from_user.id,info=answer.lower())
-		await state.finish()
-	if Test.locale:
-		print("locale")
+@dp.message_handler(state=Test.info)
+async def info_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.from_user.id,info=answer.lower())
+	await state.finish()
+
+@dp.message_handler(state=Test.locale)
+async def locale_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.from_user.id,locale=answer.lower())
+	await state.finish()
+
+@dp.message_handler(state=Test.date)
+async def date_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.from_user.id,date=answer.lower())
+	await state.finish()
+
+@dp.message_handler(state=Test.price)
+async def price_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.from_user.id,price=answer.lower())
+	await state.finish()
+
+@dp.message_handler(state=Test.cardinfo)
+async def cardinfo_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.from_user.id,card_info=answer.lower())
+	await state.finish()
 
 
 
-@dp.message_handler(commands=['start', 'help', 'setinfo', 'setlocate', 
+
+
+@dp.message_handler(commands=['start', 'help', 'setinfo', 'setlocale', 
 							  'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if message.text.lower() == '/start':
@@ -52,17 +75,16 @@ async def send_command(message: types.Message):
 		await message.answer("А теперь отправь информацию о тусовочке!")
 		await Test.info.set()
 	elif message.text.lower() == "/setlocale":
-		await message.answer("А теперь выбери формат адреса",
-							reply_markup=kb.inline_kb_variant_addres)
+		await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
 	elif message.text.lower() == "/setdate":
 		await message.answer("А теперь отправь дату тусовочки!")
-		db.insert_db(message.from_user.id,date=message.text.lower())
+		await Test.date.set()
 	elif message.text.lower() == "/setprice":
 		await message.answer("А теперь отправь стоимость проходки на тусовочку!")
-		db.insert_db(message.from_user.id,price=message.text.lower())
+		await Test.price.set()
 	elif message.text.lower() == "/setcardinfo":
 		await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
-		db.insert_db(message.from_user.id,card_info=message.text.lower())
+		await Test.cardinfo.set()
 
 
 @dp.message_handler(content_types = ['text'])
@@ -79,7 +101,7 @@ async def send_text(message: types.Message):
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
-		locale = db.get_from_db("locale").strip()
+		locale = db.get_from_db(str(message.from_user.id),"locale").strip()
 		if locale[0].isdigit():
 			await message.answer(locale)
 			await message.answer_location(locale.split()[0],locale.split()[1])
@@ -116,14 +138,16 @@ async def send_text(message: types.Message):
 @dp.callback_query_handler(lambda c: c.data == 'btn1')
 async def process_callback_button1(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, 'Вы выбрали координаты \
-		, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
+		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали координаты\
+, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
+		await Test.locale.set()
 
 @dp.callback_query_handler(lambda c: c.data == 'btn2')
 async def process_callback_button2(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, 'Вы выбрали адрес \
-		, теперь отправьте адрес\nНапример Киев Хрещатик 4')
+		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали адрес\
+, теперь отправьте адрес\nНапример Киев Хрещатик 4')
+		await Test.locale.set()
 
 @dp.callback_query_handler(lambda c: c.data == 'monokey')
 async def process_callback_mono(callback_query: types.CallbackQuery):

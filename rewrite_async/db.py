@@ -24,22 +24,22 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
         user = (chat_id, locale, info, list_user, date, price, card_info)
         cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?);", user)
     elif locale != "none":
-        sql = """UPDATE ListMembers SET locale = %s WHERE chat_id = %s"""
+        sql = """UPDATE users SET locale = ? WHERE chat_id = ?"""
         cur.execute(sql, (locale , chat_id))
     elif info != "none":
         sql = """UPDATE users SET info = ? WHERE chat_id = ?"""
         cur.execute(sql, (info, chat_id))
     elif list_user != "none":
-        sql = """UPDATE ListMembers SET list_user = %s WHERE chat_id = %s"""
+        sql = """UPDATE users SET list_user = ? WHERE chat_id = ?"""
         cur.execute(sql, (locale, chat_id))
     elif date != "none":
-        sql = """UPDATE ListMembers SET date = %s WHERE chat_id = %s"""
+        sql = """UPDATE users SET date = ? WHERE chat_id = ?"""
         cur.execute(sql, (locale, chat_id))
     elif price != "none":
-        sql = """UPDATE ListMembers SET price = %s WHERE chat_id = %s"""
+        sql = """UPDATE users SET price = ? WHERE chat_id = ?"""
         cur.execute(sql, (locale, chat_id))
     elif card_info != "none":
-        sql = """UPDATE ListMembers SET card_info = %s WHERE chat_id = %s"""
+        sql = """UPDATE users SET card_info = ? WHERE chat_id = ?"""
         cur.execute(sql, (locale, chat_id))
     conn.commit()
 
@@ -50,18 +50,18 @@ def get_from_db(chat_id,message):
         sql = """SELECT info FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
     elif message == "date":
-        sql = """SELECT date WHERE chat_id = %s"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT date FROM users  WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
     elif message == "locale":
-        sql = """SELECT locale WHERE chat_id = ?"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT locale FROM users WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
     elif message == "price":
-        sql = """SELECT price WHERE chat_id = %s"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT price FROM user WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
     elif message == "card_info":
-        sql = """SELECT card_info WHERE chat_id = %s"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT card_info FROM user WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
     elif message == "list_user":
-        sql = """SELECT list_user WHERE chat_id = %s"""
-        cur.execute(sql, (chat_id))
+        sql = """SELECT list_user FROM user WHERE chat_id = ?"""
+        cur.execute(sql, (chat_id,))
     return cur.fetchone()[0]
