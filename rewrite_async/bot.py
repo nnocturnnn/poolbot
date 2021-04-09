@@ -9,6 +9,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import BoundFilter
 
 
 class Test(StatesGroup):
@@ -18,6 +19,17 @@ class Test(StatesGroup):
 	price = State()
 	cardinfo = State()
 
+class MyFilter(BoundFilter):
+    key = 'is_admin'
+
+    def __init__(self, is_admin):
+        self.is_admin = is_admin
+
+    async def check(self, message: types.Message):
+        member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+        return member.is_chat_admin()
+
+
 API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
 SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +37,11 @@ geolocator = Nominatim(user_agent="tusabot")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot,storage=MemoryStorage())
+dp.filters_factory.bind(MyFilter)
 
+async def check(message: types.Message):
+	member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+	return member.is_chat_admin()
 
 
 @dp.message_handler(state=Test.info)
@@ -67,32 +83,32 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 
 
 
-@dp.message_handler(commands=['start', 'help', 'setinfo', 'setlocale', 
-							  'setdate', 'setprice','setcardinfo'])
+@dp.message_handler(is_admin=True)
 async def send_command(message: types.Message):
-	if message.text.lower() == '/start':
-		db.insert_db(message.chat.id)
-		await message.answer( f'{message.from_user.first_name} , добро \
-		пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
-	elif message.text.lower() == "/help":
-		await message.answer("Этот бот поможет организовать тусовочку\n\
+	if check(message):
+		if message.text.lower() == '/start':
+			db.insert_db(message.chat.id)
+			await message.answer( f'{message.from_user.first_name} , добро \
+пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
+		elif message.text.lower() == "/help":
+			await message.answer("Этот бот поможет организовать тусовочку\n\
 /setinfo - установить информацию тусовочки\n/setlocale - установить место\n\
 /setdate - установить дату\n/setprice - установить цену\n/setcardinfo \
-		- установить автопроверку платежей (Monobank, PrivatBank)")
-	elif message.text.lower() == "/setinfo":
-		await message.answer("А теперь отправь информацию о тусовочке!")
-		await Test.info.set()
-	elif message.text.lower() == "/setlocale":
-		await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
-	elif message.text.lower() == "/setdate":
-		await message.answer("А теперь отправь дату тусовочки!\nНапример 17.03")
-		await Test.date.set()
-	elif message.text.lower() == "/setprice":
-		await message.answer("А теперь отправь стоимость проходки на тусовочку!")
-		await Test.price.set()
-	elif message.text.lower() == "/setcardinfo":
-		await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
-		await Test.cardinfo.set()
+			- установить автопроверку платежей (Monobank, PrivatBank)")
+		elif message.text.lower() == "/setinfo":
+			await message.answer("А теперь отправь информацию о тусовочке!")
+			await Test.info.set()
+		elif message.text.lower() == "/setlocale":
+			await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
+		elif message.text.lower() == "/setdate":
+			await message.answer("А теперь отправь дату тусовочки!\nНапример 17.03")
+			await Test.date.set()
+		elif message.text.lower() == "/setprice":
+			await message.answer("А теперь отправь стоимость проходки на тусовочку!")
+			await Test.price.set()
+		elif message.text.lower() == "/setcardinfo":
+			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
+			await Test.cardinfo.set()
 
 
 @dp.message_handler(content_types = ['text'])
