@@ -31,16 +31,16 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
         cur.execute(sql, (info, chat_id))
     elif list_user != "none":
         sql = """UPDATE users SET list_user = ? WHERE chat_id = ?"""
-        cur.execute(sql, (locale, chat_id))
+        cur.execute(sql, (list_user, chat_id))
     elif date != "none":
         sql = """UPDATE users SET date = ? WHERE chat_id = ?"""
-        cur.execute(sql, (locale, chat_id))
+        cur.execute(sql, (date, chat_id))
     elif price != "none":
         sql = """UPDATE users SET price = ? WHERE chat_id = ?"""
-        cur.execute(sql, (locale, chat_id))
+        cur.execute(sql, (price, chat_id))
     elif card_info != "none":
         sql = """UPDATE users SET card_info = ? WHERE chat_id = ?"""
-        cur.execute(sql, (locale, chat_id))
+        cur.execute(sql, (card_info, chat_id))
     conn.commit()
 
 def get_from_db(chat_id,message):

@@ -4,7 +4,7 @@ import other
 import db
 import key as kb
 import os
-
+from geopy.geocoders import Nominatim
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
@@ -21,39 +21,47 @@ class Test(StatesGroup):
 API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
 SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
+geolocator = Nominatim(user_agent="tusabot")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot,storage=MemoryStorage())
 
+
+
 @dp.message_handler(state=Test.info)
 async def info_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.from_user.id,info=answer.lower())
+	await bot.unpin_all_chat_messages(message.chat.id)
+	await bot.pin_chat_message(message.chat.id, message.message_id)
+	db.insert_db(message.chat.id,info=answer)
 	await state.finish()
 
 @dp.message_handler(state=Test.locale)
 async def locale_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.from_user.id,locale=answer.lower())
+	db.insert_db(message.chat.id,locale=answer.lower())
 	await state.finish()
 
 @dp.message_handler(state=Test.date)
 async def date_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.from_user.id,date=answer.lower())
+	db.insert_db(message.chat.id,date=answer.lower())
+	print(message.chat.id)
 	await state.finish()
 
 @dp.message_handler(state=Test.price)
 async def price_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.from_user.id,price=answer.lower())
+	db.insert_db(message.chat.id,price=answer.lower())
 	await state.finish()
 
 @dp.message_handler(state=Test.cardinfo)
 async def cardinfo_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.from_user.id,card_info=answer.lower())
+	db.insert_db(message.chat.id,card_info=answer.lower())
 	await state.finish()
+
+
 
 
 
@@ -63,7 +71,7 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 							  'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if message.text.lower() == '/start':
-		db.insert_db(message.from_user.id)
+		db.insert_db(message.chat.id)
 		await message.answer( f'{message.from_user.first_name} , добро \
 		пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
 	elif message.text.lower() == "/help":
@@ -77,7 +85,7 @@ async def send_command(message: types.Message):
 	elif message.text.lower() == "/setlocale":
 		await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
 	elif message.text.lower() == "/setdate":
-		await message.answer("А теперь отправь дату тусовочки!")
+		await message.answer("А теперь отправь дату тусовочки!\nНапример 17.03")
 		await Test.date.set()
 	elif message.text.lower() == "/setprice":
 		await message.answer("А теперь отправь стоимость проходки на тусовочку!")
@@ -94,21 +102,22 @@ async def send_text(message: types.Message):
 		"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
 		await message.answer(other.pogodka())
-	elif message.text.lower() == 'инфо':
-		await message.answer(db.get_from_db(str(message.from_user.id),"info"))
+	if message.text.lower() == 'когда туса?':
+		await message.answer(db.get_from_db(str(message.chat.id),"date"))
+	elif message.text.lower() == 'информация':
+		await message.answer(db.get_from_db(str(message.chat.id),"info"))
 	elif message.text.lower() == 'кто будет?':
 		await message.answer(db.get_from_db("list_user"))
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
-		locale = db.get_from_db(str(message.from_user.id),"locale").strip()
+		locale = db.get_from_db(str(message.chat.id),"locale").strip()
 		if locale[0].isdigit():
-			await message.answer(locale)
 			await message.answer_location(locale.split()[0],locale.split()[1])
 		else:
 			try:
 				location = geolocator.geocode(locale, language='ru')
-				await message.answer(locale)
+				await message.answer(location)
 				await message.answer_location(location.latitude, location.longitude)
 			except:
 				bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
@@ -181,6 +190,9 @@ async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Наличные \
 		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
+
+
+
 
 if __name__ == '__main__':
 	db.start_db()
