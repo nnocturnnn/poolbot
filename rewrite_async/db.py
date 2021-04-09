@@ -7,9 +7,9 @@ def start_db():
                 chat_id INT PRIMARY KEY,
                 locale TEXT,
                 info TEXT,
-                list_user TEXT
-                date TEXT
-                price TEXT
+                list_user TEXT,
+                date TEXT,
+                price TEXT,
                 card_info TEXT);
                 """)
     conn.commit()
@@ -22,7 +22,7 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
     if locale == "none" and info == "none" and list_user == "none" and \
         date == "none" and price == "none" and card_info == "none":
         user = (chat_id, locale, info, list_user, date, price, card_info)
-        cur.executemany("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?);", user)
+        cur.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?);", user)
     elif locale != "none":
         sql = """UPDATE ListMembers SET locale = %s WHERE chat_id = %s"""
         cur.execute(sql, (locale , chat_id))
@@ -49,7 +49,6 @@ def get_from_db(chat_id,message):
     if message == "info":
         sql = """SELECT info FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
-        print(cur.fetchall())
     elif message == "date":
         sql = """SELECT date WHERE chat_id = %s"""
         cur.execute(sql, (chat_id))
@@ -65,4 +64,4 @@ def get_from_db(chat_id,message):
     elif message == "list_user":
         sql = """SELECT list_user WHERE chat_id = %s"""
         cur.execute(sql, (chat_id))
-    return "value"
+    return cur.fetchone()[0]

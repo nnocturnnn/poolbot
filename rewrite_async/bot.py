@@ -6,18 +6,41 @@ import key as kb
 import os
 
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.dispatcher import FSMContext
+
+
+class Test(StatesGroup):
+	info = State()
+	locale = State()
+	date = State()
+	price = State()
+	cardinfo = State()
 
 API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
 SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot,storage=MemoryStorage())
+
+@dp.message_handler(state=Test.info | Test.locale | Test.date | Test.price | Test.cardinfo)
+async def db_state(message: types.Message, state: FSMContext):
+	if Test.info:
+		answer = message.text
+		db.insert_db(message.from_user.id,info=answer.lower())
+		await state.finish()
+	if Test.locale:
+		print("locale")
+
+
 
 @dp.message_handler(commands=['start', 'help', 'setinfo', 'setlocate', 
 							  'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if message.text.lower() == '/start':
+		db.insert_db(message.from_user.id)
 		await message.answer( f'{message.from_user.first_name} , добро \
 		пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
 	elif message.text.lower() == "/help":
@@ -27,7 +50,7 @@ async def send_command(message: types.Message):
 		- установить автопроверку платежей (Monobank, PrivatBank)")
 	elif message.text.lower() == "/setinfo":
 		await message.answer("А теперь отправь информацию о тусовочке!")
-		db.insert_db(message.from_user.id,info=message.text.lower())
+		await Test.info.set()
 	elif message.text.lower() == "/setlocale":
 		await message.answer("А теперь выбери формат адреса",
 							reply_markup=kb.inline_kb_variant_addres)
