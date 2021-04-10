@@ -80,7 +80,7 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo',
-					'setlocale', 'setdate', 'setprice','setcardinfo'])
+					'setlocale', 'setdate', 'setprice','setcardinfo','delete'])
 async def send_command(message: types.Message):
 	if check(message):
 		if message.text.lower().startswith('/start'):
@@ -107,8 +107,14 @@ async def send_command(message: types.Message):
 			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
 			await Test.cardinfo.set()
 		elif message.text.lower().startswith("/delete"):
-			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
-			await Test.cardinfo.set()
+			str_to_db = db.get_from_db(str(message.chat.id),"list_user")
+			user = message.text.split()[1]
+			if str_to_db.find(user) == -1:
+				await message.answer(user + " - нет в списке")
+			else:
+				str_to_db = str_to_db.replace(user + "\n","")
+				db.insert_db(message.chat.id,list_user=str_to_db)
+				await message.answer(user + " - удалил из списка")
 
 
 @dp.message_handler(content_types = ['text'])
@@ -118,25 +124,40 @@ async def send_text(message: types.Message):
 		"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
 		await message.answer(other.pogodka())
-	elif message.text.lower() == 'когда туса?':
+	elif message.text.lower() == '/key':
+		await message.answer("Вот список моих комманд:",reply_markup=kb.markup_key)
+	elif message.text.lower() == 'дата':
 		await message.answer(db.get_from_db(str(message.chat.id),"date"))
 	elif message.text.lower() == 'цена':
 		await message.answer(db.get_from_db(str(message.chat.id),"price"))
-	elif message.text.lower() == 'информация':
+	elif message.text.lower() == 'инфо':
 		await message.answer(db.get_from_db(str(message.chat.id),"info"))
 	elif message.text.lower() == 'кто будет?':
 		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
 	elif message.text.lower() == 'я буду':
 		str_to_db = db.get_from_db(str(message.chat.id),"list_user")
-		try:
-			user = message.from_user.username
-		except:
+		user = message.from_user.username
+		if user is None:
 			user = message.from_user.full_name
-		if str_to_db == "none":
-			db.insert_db(message.chat.id,list_user=user + "\n")
+		if str_to_db.find(user) == -1:
+			if str_to_db == "none":
+				db.insert_db(message.chat.id,list_user= "@" + user + "\n")
+			else:
+				db.insert_db(message.chat.id,list_user=str_to_db + "@" + user + "\n")
+			await message.answer("@" + user + " - добавил тебя в список")
 		else:
-			db.insert_db(message.chat.id,list_user=str_to_db + user + "\n")
-		await message.answer("@" + user + " ты в списке")
+			await message.answer("@" + user + " - извини но ты уже в списке")
+	elif message.text.lower() == 'не буду':
+		str_to_db = db.get_from_db(str(message.chat.id),"list_user")
+		user = message.from_user.username
+		if user is None:
+			user = message.from_user.full_name
+		if str_to_db.find(user) == -1:
+			await message.answer("@" + user + " - тебя нет в списке")
+		else:
+			str_to_db = str_to_db.replace("@" + user + "\n","")
+			db.insert_db(message.chat.id,list_user=str_to_db)
+			await message.answer("@" + user + " - удалил тебя из списка")
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':

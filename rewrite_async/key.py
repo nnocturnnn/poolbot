@@ -1,4 +1,5 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, \
+    ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 
 inline_kb_variant_addres = InlineKeyboardMarkup(row_width=2)
 inline_btn_1 = InlineKeyboardButton('Координаты', callback_data='btn1')
@@ -16,3 +17,16 @@ mono_pay = InlineKeyboardButton('Monobank', callback_data='mono_pay')
 private_pay = InlineKeyboardButton('PrivatBank', callback_data='private_pay')
 nal_pay = InlineKeyboardButton('Наличные', callback_data='nal_pay')
 payment_kb.add(mono_pay, private_pay, nal_pay)
+
+
+markup_key = ReplyKeyboardMarkup(resize_keyboard=True,row_width=3)
+wether = KeyboardButton('погодка')
+geo = KeyboardButton('геолока')
+income = KeyboardButton('бюджет')
+info = KeyboardButton('инфо')
+price = KeyboardButton('цена')
+date = KeyboardButton('дата')
+be = KeyboardButton('я буду')
+who_be = KeyboardButton('кто будет?')
+dont_be = KeyboardButton('не буду')
+markup_key.add(wether,geo,income,info,price,date,be,who_be,dont_be)
