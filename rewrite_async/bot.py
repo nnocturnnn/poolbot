@@ -209,14 +209,14 @@ async def process_callback_button2(callback_query: types.CallbackQuery):
 async def process_callback_mono(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Монобанк \
-, теперь отправьте токен монобанка\nНапример Adf42sdf2342442sdf2314432 4441114446179218\n\
+, теперь отправьте токен монобанка и номер карты\nНапример Adf42sdf2342442sdf2314432 4441114446179218\n\
 Чтобы получить токен монобанка перейдите по ссылке https://api.monobank.ua/')
 
 @dp.callback_query_handler(lambda c: c.data == 'privatekey')
 async def process_callback_private(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Приватбанк\
-, теперь отправьте токен, номер карты \nНапример Adf42sdf2342442sdf2314432 4441114446179218 \n\
+, теперь отправьте токен и номер карты\nНапример Adf42sdf2342442sdf2314432 4441114446179218 \n\
 Чтобы получить токен приватбанка перейдите по ссылке https://api.privatbank.ua/#p24/registration')
 
 
