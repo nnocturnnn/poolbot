@@ -56,12 +56,12 @@ def get_from_db(chat_id,message):
         sql = """SELECT locale FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
     elif message == "price":
-        sql = """SELECT price FROM user WHERE chat_id = ?"""
+        sql = """SELECT price FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
     elif message == "card_info":
-        sql = """SELECT card_info FROM user WHERE chat_id = ?"""
+        sql = """SELECT card_info FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
     elif message == "list_user":
-        sql = """SELECT list_user FROM user WHERE chat_id = ?"""
+        sql = """SELECT list_user FROM users WHERE chat_id = ?"""
         cur.execute(sql, (chat_id,))
     return cur.fetchone()[0]

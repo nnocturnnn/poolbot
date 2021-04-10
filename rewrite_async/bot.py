@@ -4,6 +4,7 @@ import other
 import db
 import key as kb
 import os
+import requests
 from geopy.geocoders import Nominatim
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -31,7 +32,6 @@ class MyFilter(BoundFilter):
 
 
 API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
-SPOTIFY_TOKEN = '0f6f810bd15b4caeb003ec37402d0e5b'
 logging.basicConfig(level=logging.INFO)
 geolocator = Nominatim(user_agent="tusabot")
 
@@ -47,9 +47,9 @@ async def check(message: types.Message):
 @dp.message_handler(state=Test.info)
 async def info_state(message: types.Message, state: FSMContext):
 	answer = message.text
+	db.insert_db(message.chat.id,info=answer)
 	await bot.unpin_all_chat_messages(message.chat.id)
 	await bot.pin_chat_message(message.chat.id, message.message_id)
-	db.insert_db(message.chat.id,info=answer)
 	await state.finish()
 
 @dp.message_handler(state=Test.locale)
@@ -79,11 +79,8 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 
 
 
-
-
-
-
-@dp.message_handler(is_admin=True)
+@dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo', 'setlocale', 
+							  'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if check(message):
 		if message.text.lower() == '/start':
@@ -109,6 +106,9 @@ async def send_command(message: types.Message):
 		elif message.text.lower() == "/setcardinfo":
 			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
 			await Test.cardinfo.set()
+		elif message.text.lower().startswith("/delete"):
+			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
+			await Test.cardinfo.set()
 
 
 @dp.message_handler(content_types = ['text'])
@@ -118,12 +118,14 @@ async def send_text(message: types.Message):
 		"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
 		await message.answer(other.pogodka())
-	if message.text.lower() == 'когда туса?':
+	elif message.text.lower() == 'когда туса?':
 		await message.answer(db.get_from_db(str(message.chat.id),"date"))
+	elif message.text.lower() == 'цена':
+		await message.answer(db.get_from_db(str(message.chat.id),"price"))
 	elif message.text.lower() == 'информация':
 		await message.answer(db.get_from_db(str(message.chat.id),"info"))
 	elif message.text.lower() == 'кто будет?':
-		await message.answer(db.get_from_db("list_user"))
+		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
@@ -131,13 +133,10 @@ async def send_text(message: types.Message):
 		if locale[0].isdigit():
 			await message.answer_location(locale.split()[0],locale.split()[1])
 		else:
-			try:
-				location = geolocator.geocode(locale, language='ru')
-				await message.answer(location)
-				await message.answer_location(location.latitude, location.longitude)
-			except:
-				bot.send_message(message.chat.id, 'Cервер выебываеться попробуйте позже 😔 😔 😔')
-	elif message.text.lower() == 'бюджет': #TODO исправить два трая на один
+			location = geolocator.geocode(locale, language='ru')
+			await message.answer(location)
+			await message.answer_location(location.latitude, location.longitude)
+	elif message.text.lower() == 'бюджет':
 		try:
 			await message.answer("Бюджет тусовочки 💴 💴 💴 " + \
 				 privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753",\
@@ -151,13 +150,9 @@ async def send_text(message: types.Message):
 				await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'оплатить':
 		await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
-	elif message.text.lower() == 'добавить песню в плейлист':
-		await message.answer("Теперь отправьте название песни:")
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		await message.answer(rer)
-	elif message.text.lower() == 'playmusic':
-		pass
 
 
 @dp.callback_query_handler(lambda c: c.data == 'btn1')
@@ -177,34 +172,34 @@ async def process_callback_button2(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == 'monokey')
 async def process_callback_mono(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, 'Вы выбрали Монобанк \
-		, теперь отправьте токен монобанка\nНапример Adf42sdf2342442sdf2314432\n\
-		Чтобы получить токен монобанка перейдите по ссылке https://api.monobank.ua/')
+		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Монобанк \
+, теперь отправьте токен монобанка\nНапример Adf42sdf2342442sdf2314432\n\
+Чтобы получить токен монобанка перейдите по ссылке https://api.monobank.ua/')
 
 @dp.callback_query_handler(lambda c: c.data == 'privatekey')
 async def process_callback_private(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, 'Вы выбрали Приватбанк \
-		, теперь отправьте токен, номер карты \nНапример Adf42sdf2342442sdf2314432 4441114446179218 \n \
-		Чтобы получить токен приватбанка перейдите по ссылке https://api.privatbank.ua/#p24/registration')
+		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Приватбанк\
+, теперь отправьте токен, номер карты \nНапример Adf42sdf2342442sdf2314432 4441114446179218 \n\
+Чтобы получить токен приватбанка перейдите по ссылке https://api.privatbank.ua/#p24/registration')
 
 
 @dp.callback_query_handler(lambda c: c.data == 'private_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Приватбанк \
-		, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
+		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Приватбанк\
+, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'mono_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Монобанк \
-		, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
+		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
+, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'nal_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.from_user.id, f'Вы выбрали Наличные \
+		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные \
 		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 
