@@ -6,6 +6,10 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from xml.dom.minidom import parseString
 
+# import monobank
+# token = 'u9z0t-MyklvB8QOuNxjWaf9wAPe93Uy_eQEAEsFYrZdM'
+# mono = monobank.Client(token)
+# print(user_info['accounts'][2])
 geolocator = Nominatim(user_agent="tusabot")
 
 def get_near_terminal(message):

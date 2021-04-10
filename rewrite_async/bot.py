@@ -232,7 +232,7 @@ async def process_callback_mono_pay(callback_query: types.CallbackQuery):
 async def process_callback_nal_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные \
-		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
+, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 
 
