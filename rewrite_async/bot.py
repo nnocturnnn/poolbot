@@ -74,13 +74,13 @@ async def price_state(message: types.Message, state: FSMContext):
 @dp.message_handler(state=Test.cardprivate)
 async def cardprivate_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.chat.id,card_info=answer.lower())
+	db.insert_db(message.chat.id,private=answer.lower())
 	await state.finish()
 
 @dp.message_handler(state=Test.cardmono)
 async def ccardmono_state(message: types.Message, state: FSMContext):
 	answer = message.text
-	db.insert_db(message.chat.id,card_info=answer.lower())
+	db.insert_db(message.chat.id,mono=answer.lower())
 	await state.finish()
 
 
@@ -162,8 +162,8 @@ async def send_text(message: types.Message):
 			str_to_db = str_to_db.replace("@" + user + "\n","")
 			db.insert_db(message.chat.id,list_user=str_to_db)
 			await message.answer("@" + user + " - удалил тебя из списка")
-	elif message.text.lower() == 'кто скинул?':
-		await message.answer(db.get_from_db("list_user2"))
+	# elif message.text.lower() == 'кто скинул?':
+	# 	await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
 		locale = db.get_from_db(str(message.chat.id),"locale").strip()
 		if locale[0].isdigit():
@@ -211,6 +211,7 @@ async def process_callback_mono(callback_query: types.CallbackQuery):
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Монобанк \
 , теперь отправьте токен монобанка и номер карты\nНапример Adf42sdf2342442sdf2314432 4441114446179218\n\
 Чтобы получить токен монобанка перейдите по ссылке https://api.monobank.ua/')
+		await Test.cardmono.set()
 
 @dp.callback_query_handler(lambda c: c.data == 'privatekey')
 async def process_callback_private(callback_query: types.CallbackQuery):
@@ -218,25 +219,44 @@ async def process_callback_private(callback_query: types.CallbackQuery):
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Приватбанк\
 , теперь отправьте токен и номер карты\nНапример Adf42sdf2342442sdf2314432 4441114446179218 \n\
 Чтобы получить токен приватбанка перейдите по ссылке https://api.privatbank.ua/#p24/registration')
-
+		await Test.cardprivate.set()
 
 @dp.callback_query_handler(lambda c: c.data == 'private_pay')
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Приватбанк\
-, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
+		info = db.get_from_db(callback_query.message.chat.id,"private")
+		price = db.get_from_db(callback_query.message.chat.id,"price")
+		if info == "none":
+			await bot.send_message(callback_query.message.chat.id,"К сожалению Приватбанк не был подключен")
+		else:
+			card_num = info.split()[1]
+			await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Приватбанк\
+, теперь отправьте {price} гривен на {card_num} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'mono_pay')
 async def process_callback_mono_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
-, теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
+		info = db.get_from_db(callback_query.message.chat.id,"mono")
+		price = db.get_from_db(callback_query.message.chat.id,"price")
+		if info == "none":
+			await bot.send_message(callback_query.message.chat.id,"К сожалению Монобанк не был подключен")
+		else:
+			card_num = info.split()[1]
+			await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
+, теперь отправьте {price} гривен на {card_num} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'nal_pay')
 async def process_callback_nal_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные \
-, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
+		info_mono = db.get_from_db(callback_query.message.chat.id,"mono")
+		info_private = "none"
+		if info_mono == "none":
+			card_num = info_mono
+		else:
+			card_num = info_mono.split()[1]
+		price = db.get_from_db(callback_query.message.chat.id,"price")
+		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные\
+, теперь отправьте {price} гривен на {card_num} или на {info_private} подождите после отправки 1 минуту и нажмите Проверить')
 
 
 
