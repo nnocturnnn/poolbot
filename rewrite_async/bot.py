@@ -31,7 +31,7 @@ class MyFilter(BoundFilter):
         return member.is_chat_admin()
 
 
-API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'        # TODO убрать в проде
+API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'
 logging.basicConfig(level=logging.INFO)
 geolocator = Nominatim(user_agent="tusabot")
 
@@ -79,8 +79,8 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 
 
 
-@dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo', 'setlocale', 
-							  'setdate', 'setprice','setcardinfo'])
+@dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo',
+					'setlocale', 'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if check(message):
 		if message.text.lower() == '/start':
@@ -125,6 +125,8 @@ async def send_text(message: types.Message):
 	elif message.text.lower() == 'информация':
 		await message.answer(db.get_from_db(str(message.chat.id),"info"))
 	elif message.text.lower() == 'кто будет?':
+		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
+	elif message.text.lower() == 'я буду?':
 		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
@@ -191,13 +193,13 @@ async def process_callback_private_pay(callback_query: types.CallbackQuery):
 , теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'mono_pay')
-async def process_callback_private_pay(callback_query: types.CallbackQuery):
+async def process_callback_mono_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
 , теперь отправьте {1} гривен на {1} подождите после отправки 1 минуту и нажмите Проверить')
 
 @dp.callback_query_handler(lambda c: c.data == 'nal_pay')
-async def process_callback_private_pay(callback_query: types.CallbackQuery):
+async def process_callback_nal_pay(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные \
 		, теперь отправьте {1} гривен на {1} или на {1} подождите после отправки 1 минуту и нажмите Проверить')
