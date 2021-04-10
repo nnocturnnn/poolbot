@@ -10,6 +10,3 @@ def pogodka():
 	pogodka = ("На тусовочке будет : " + w.get_detailed_status() 
 			+ "\nТемпература около : " + str(temp) + " градусов")
 	return pogodka
-
-def get_mp4():
-	pass

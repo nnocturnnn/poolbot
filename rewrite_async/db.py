@@ -29,7 +29,7 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
     elif info != "none":
         sql = """UPDATE users SET info = ? WHERE chat_id = ?"""
         cur.execute(sql, (info, chat_id))
-    elif list_user != "none":
+    elif list_user != "":
         sql = """UPDATE users SET list_user = ? WHERE chat_id = ?"""
         cur.execute(sql, (list_user, chat_id))
     elif date != "none":

@@ -83,10 +83,10 @@ async def cardinfo_state(message: types.Message, state: FSMContext):
 					'setlocale', 'setdate', 'setprice','setcardinfo'])
 async def send_command(message: types.Message):
 	if check(message):
-		if message.text.lower() == '/start':
+		if message.text.lower().startswith('/start'):
 			db.insert_db(message.chat.id)
 			await message.answer( f'{message.from_user.first_name} , добро \
-пожаловать к PartyBot!\n Есть вопросы? Обратись к помощи /help\n')
+пожаловать к PartyBot!\nЕсть вопросы? Обратись к помощи /help\n')
 		elif message.text.lower() == "/help":
 			await message.answer("Этот бот поможет организовать тусовочку\n\
 /setinfo - установить информацию тусовочки\n/setlocale - установить место\n\
@@ -126,8 +126,17 @@ async def send_text(message: types.Message):
 		await message.answer(db.get_from_db(str(message.chat.id),"info"))
 	elif message.text.lower() == 'кто будет?':
 		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
-	elif message.text.lower() == 'я буду?':
-		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
+	elif message.text.lower() == 'я буду':
+		str_to_db = db.get_from_db(str(message.chat.id),"list_user")
+		try:
+			user = message.from_user.username
+		except:
+			user = message.from_user.full_name
+		if str_to_db == "none":
+			db.insert_db(message.chat.id,list_user=user + "\n")
+		else:
+			db.insert_db(message.chat.id,list_user=str_to_db + user + "\n")
+		await message.answer("@" + user + " ты в списке")
 	elif message.text.lower() == 'кто скинул?':
 		await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
