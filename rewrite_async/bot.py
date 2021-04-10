@@ -18,7 +18,8 @@ class Test(StatesGroup):
 	locale = State()
 	date = State()
 	price = State()
-	cardinfo = State()
+	cardprivate = State()
+	cardmono = State()
 
 class MyFilter(BoundFilter):
     key = 'is_admin'
@@ -62,7 +63,6 @@ async def locale_state(message: types.Message, state: FSMContext):
 async def date_state(message: types.Message, state: FSMContext):
 	answer = message.text
 	db.insert_db(message.chat.id,date=answer.lower())
-	print(message.chat.id)
 	await state.finish()
 
 @dp.message_handler(state=Test.price)
@@ -71,12 +71,17 @@ async def price_state(message: types.Message, state: FSMContext):
 	db.insert_db(message.chat.id,price=answer.lower())
 	await state.finish()
 
-@dp.message_handler(state=Test.cardinfo)
-async def cardinfo_state(message: types.Message, state: FSMContext):
+@dp.message_handler(state=Test.cardprivate)
+async def cardprivate_state(message: types.Message, state: FSMContext):
 	answer = message.text
 	db.insert_db(message.chat.id,card_info=answer.lower())
 	await state.finish()
 
+@dp.message_handler(state=Test.cardmono)
+async def ccardmono_state(message: types.Message, state: FSMContext):
+	answer = message.text
+	db.insert_db(message.chat.id,card_info=answer.lower())
+	await state.finish()
 
 
 @dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo',
@@ -105,7 +110,6 @@ async def send_command(message: types.Message):
 			await Test.price.set()
 		elif message.text.lower() == "/setcardinfo":
 			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
-			await Test.cardinfo.set()
 		elif message.text.lower().startswith("/delete"):
 			str_to_db = db.get_from_db(str(message.chat.id),"list_user")
 			user = message.text.split()[1]
@@ -205,7 +209,7 @@ async def process_callback_button2(callback_query: types.CallbackQuery):
 async def process_callback_mono(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали Монобанк \
-, теперь отправьте токен монобанка\nНапример Adf42sdf2342442sdf2314432\n\
+, теперь отправьте токен монобанка\nНапример Adf42sdf2342442sdf2314432 4441114446179218\n\
 Чтобы получить токен монобанка перейдите по ссылке https://api.monobank.ua/')
 
 @dp.callback_query_handler(lambda c: c.data == 'privatekey')
