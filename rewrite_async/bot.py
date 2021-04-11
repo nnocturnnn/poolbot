@@ -123,6 +123,7 @@ async def send_command(message: types.Message):
 
 @dp.message_handler(content_types = ['text'])
 async def send_text(message: types.Message):
+	m_id = message.chat.id
 	proxyDict = {
 		"http"  : os.environ.get('FIXIE_URL', ''), 
 		"https" : os.environ.get('FIXIE_URL', '')}
@@ -131,28 +132,28 @@ async def send_text(message: types.Message):
 	elif message.text.lower() == '/key':
 		await message.answer("Вот список моих комманд:",reply_markup=kb.markup_key)
 	elif message.text.lower() == 'дата':
-		await message.answer(db.get_from_db(str(message.chat.id),"date"))
+		await message.answer(db.get_from_db(str(m_id),"date"))
 	elif message.text.lower() == 'цена':
-		await message.answer(db.get_from_db(str(message.chat.id),"price"))
+		await message.answer(db.get_from_db(str(m_id),"price"))
 	elif message.text.lower() == 'инфо':
-		await message.answer(db.get_from_db(str(message.chat.id),"info"))
+		await message.answer(db.get_from_db(str(m_id),"info"))
 	elif message.text.lower() == 'кто будет?':
-		await message.answer(db.get_from_db(str(message.chat.id),"list_user"))
+		await message.answer(db.get_from_db(str(m_id),"list_user"))
 	elif message.text.lower() == 'я буду':
-		str_to_db = db.get_from_db(str(message.chat.id),"list_user")
+		str_to_db = db.get_from_db(str(m_id),"list_user")
 		user = message.from_user.username
 		if user is None:
 			user = message.from_user.full_name
 		if str_to_db.find(user) == -1:
 			if str_to_db == "none":
-				db.insert_db(message.chat.id,list_user= "@" + user + "\n")
+				db.insert_db(m_id,list_user= "@" + user + "\n")
 			else:
-				db.insert_db(message.chat.id,list_user=str_to_db + "@" + user + "\n")
+				db.insert_db(m_id,list_user=str_to_db + "@" + user + "\n")
 			await message.answer("@" + user + " - добавил тебя в список")
 		else:
 			await message.answer("@" + user + " - извини но ты уже в списке")
 	elif message.text.lower() == 'не буду':
-		str_to_db = db.get_from_db(str(message.chat.id),"list_user")
+		str_to_db = db.get_from_db(str(m_id),"list_user")
 		user = message.from_user.username
 		if user is None:
 			user = message.from_user.full_name
@@ -160,12 +161,10 @@ async def send_text(message: types.Message):
 			await message.answer("@" + user + " - тебя нет в списке")
 		else:
 			str_to_db = str_to_db.replace("@" + user + "\n","")
-			db.insert_db(message.chat.id,list_user=str_to_db)
+			db.insert_db(m_id,list_user=str_to_db)
 			await message.answer("@" + user + " - удалил тебя из списка")
-	# elif message.text.lower() == 'кто скинул?':
-	# 	await message.answer(db.get_from_db("list_user2"))
 	elif message.text.lower() == 'геолока':
-		locale = db.get_from_db(str(message.chat.id),"locale").strip()
+		locale = db.get_from_db(str(m_id),"locale").strip()
 		if locale[0].isdigit():
 			await message.answer_location(locale.split()[0],locale.split()[1])
 		else:
@@ -174,16 +173,11 @@ async def send_text(message: types.Message):
 			await message.answer_location(location.latitude, location.longitude)
 	elif message.text.lower() == 'бюджет':
 		try:
-			await message.answer("Бюджет тусовочки 💴 💴 💴 " + \
-				 privat_bank(os.getenv('API_PRIVAT'), proxyDict, "153753",\
-				 "5168745302334229") + " гривен")
+			p_price = privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325","5168745302334229")
+			m_price = banking.mono_bank(m_id)
+			await message.answer("Бюджет тусовочки 💴 💴 💴 : " + m_price)
 		except:
-			try:
-				await message.answer("Бюджет тусовочки 💴 💴 💴 " + \
-					 privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325",\
-					 "5168745302334229") + " гривен")
-			except:
-				await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
+			await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'оплатить':
 		await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
 	elif message.text.lower() == 'ip':
@@ -258,8 +252,9 @@ async def process_callback_nal_pay(callback_query: types.CallbackQuery):
 		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные\
 , теперь отправьте {price} гривен на {card_num} или на {info_private} подождите после отправки 1 минуту и нажмите Проверить')
 
-
-
+@dp.callback_query_handler(lambda c: c.data == 'check_pay')
+async def process_callback_nal_pay(callback_query: types.CallbackQuery):
+	
 
 if __name__ == '__main__':
 	db.start_db()

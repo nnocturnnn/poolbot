@@ -1,15 +1,14 @@
 import requests
 import datetime
 import re
+from datetime import date
 from hashlib import md5,sha1
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from xml.dom.minidom import parseString
+import monobank
+import db
 
-# import monobank
-# token = 'u9z0t-MyklvB8QOuNxjWaf9wAPe93Uy_eQEAEsFYrZdM'
-# mono = monobank.Client(token)
-# print(user_info['accounts'][2])
 geolocator = Nominatim(user_agent="tusabot")
 
 def get_near_terminal(message):
@@ -116,7 +115,7 @@ def privat_bank_payment(password,proxyDict, idi):
     
     return finalprint
 
-def privat_bank (password,proxyDict,idi,card):
+def privat_bank(password,proxyDict,idi,card):
 
     url = "https://api.privatbank.ua/p24api/balance"
 
@@ -157,3 +156,26 @@ def privat_bank (password,proxyDict,idi,card):
     balance = re.findall(r'[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?',balancetag)
 
     return balance[0]
+
+
+def mono_bank(char_id):
+    token = db.get_from_db(char_id,"mono")
+    mono = monobank.Client(token)
+    user_info = mono.get_client_info()
+    for i in user_info['accounts']:
+        if i['type'] == 'white':
+            return i['balance'] / 100
+
+
+def mono_check(char_id):
+    token = db.get_from_db(char_id,"mono")
+    mono = monobank.Client(token)
+    user_info = mono.get_client_info()
+    id_w = ""
+    for i in user_info['accounts']:
+        if i['type'] == 'white':
+            id_w = i['id']
+    time_now = datetime.datetime.now()
+    time_p = datetime.datetime.now() - datetime.timedelta(days=1)
+    stat = mono.get_statements(id_w, time_p, time_now)
+    return stat[0]

@@ -31,3 +31,6 @@ who_be = KeyboardButton('кто будет?')
 dont_be = KeyboardButton('не буду')
 pay = KeyboardButton('оплатить')
 markup_key.add(wether,geo,income,info,price,date,be,who_be,dont_be,pay)
+
+check_kb  = InlineKeyboardMarkup()
+check_kb.add(InlineKeyboardButton('Проверить', callback_data='check_pay'))
