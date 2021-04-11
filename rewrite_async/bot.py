@@ -20,6 +20,7 @@ class Test(StatesGroup):
 	price = State()
 	cardprivate = State()
 	cardmono = State()
+	pay = State()
 
 class MyFilter(BoundFilter):
     key = 'is_admin'
@@ -83,6 +84,10 @@ async def ccardmono_state(message: types.Message, state: FSMContext):
 	db.insert_db(message.chat.id,mono=answer.lower())
 	await state.finish()
 
+
+@dp.message_handler(state=Test.info)
+async def info_state(message: types.Message, state: FSMContext):
+	await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
 
 @dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo',
 					'setlocale', 'setdate', 'setprice','setcardinfo','delete'])
@@ -179,7 +184,7 @@ async def send_text(message: types.Message):
 		except:
 			await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'оплатить':
-		await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
+		Test.pay.set()
 	elif message.text.lower() == 'ip':
 		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 		await message.answer(rer)
