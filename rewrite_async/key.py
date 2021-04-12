@@ -33,6 +33,7 @@ pay = KeyboardButton('оплатить')
 markup_key.add(wether,geo,income,info,price,date,be,who_be,dont_be,pay)
 
 check_kb  = InlineKeyboardMarkup()
-check_kb.add(InlineKeyboardButton('Проверить', callback_data='check_pay'))
+check_b = InlineKeyboardButton('Проверить')
+check_kb.add(check_b)
 
 null_kb  = InlineKeyboardMarkup()

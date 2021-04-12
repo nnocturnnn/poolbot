@@ -205,9 +205,9 @@ async def send_text(message: types.Message):
 			await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'оплатить':
 		await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
-		kb.mono_pay.callback_data = "mono_pay " + message.from_user.id
-		kb.private_pay.callback_data = "private_pay" + message.from_user.id
-		kb.nal_pay.callback_data = "nal_pay" + message.from_user.id
+		kb.mono_pay.callback_data = "mono_pay " + str(message.message_id) + " " + str(message.from_user.id)
+		kb.private_pay.callback_data = "private_pay " + str(message.message_id) + " " + str(message.from_user.id)
+		kb.nal_pay.callback_data = "nal_pay " + str(message.message_id) + " " + str(message.from_user.id)
 	# elif message.text.lower() == 'ip':
 	# 	rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
 	# 	await message.answer(rer)
@@ -271,47 +271,59 @@ async def process_callback_private(callback_query: types.CallbackQuery):
 		data = int(callback_query.data.split()[1]) + 1
 		await bot.edit_message_reply_markup(cb_m_id, data)
 
-@dp.callback_query_handler(lambda c: c.data == 'private_pay')
+@dp.callback_query_handler(lambda c: c.data.startswith('private_pay'))
 async def process_callback_private_pay(callback_query: types.CallbackQuery):
-	await bot.answer_callback_query(callback_query.id)
-	info = db.get_from_db(callback_query.message.chat.id,"private")
-	price = db.get_from_db(callback_query.message.chat.id,"price")
-	if info == "none":
-		await bot.send_message(callback_query.message.chat.id,"К сожалению Приватбанк не был подключен")
-	else:
-		card_num = info.split()[1]
-		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Приватбанк\
+	cb_m_id = callback_query.message.chat.id
+	if callback_query.data.endswith(str(callback_query.from_user.id)):
+		await bot.answer_callback_query(callback_query.id)
+		info = db.get_from_db(cb_m_id, "private")
+		price = db.get_from_db(cb_m_id, "price")
+		if info == "none":
+			await bot.send_message(cb_m_id ,"К сожалению Приватбанк не был подключен")
+		else:
+			card_num = info.split()[1]
+			await bot.send_message(cb_m_id, f'Вы выбрали Приватбанк\
 , теперь отправьте {price} гривен на {card_num} подождите после отправки 1 минуту и нажмите Проверить')
+		data = int(callback_query.data.split()[1]) + 1
+		await bot.edit_message_reply_markup(cb_m_id, data)
 
-@dp.callback_query_handler(lambda c: c.data == 'mono_pay')
+@dp.callback_query_handler(lambda c: c.data.startswith('mono_pay'))
 async def process_callback_mono_pay(callback_query: types.CallbackQuery):
-	await bot.answer_callback_query(callback_query.id)
-	info = db.get_from_db(callback_query.message.chat.id,"mono")
-	price = db.get_from_db(callback_query.message.chat.id,"price")
-	if info == "none":
-		await bot.send_message(callback_query.message.chat.id,"К сожалению Монобанк не был подключен",reply_markup=kb.check_kb)
-	else:
-		card_num = info.split()[1]
-		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
+	cb_m_id = callback_query.message.chat.id
+	if callback_query.data.endswith(str(callback_query.from_user.id)):
+		await bot.answer_callback_query(callback_query.id)
+		info = db.get_from_db(cb_m_id,"mono")
+		price = db.get_from_db(cb_m_id,"price")
+		if info == "none":
+			await bot.send_message(cb_m_id,"К сожалению Монобанк не был подключен",reply_markup=kb.check_kb)
+		else:
+			card_num = info.split()[1]
+			await bot.send_message(cb_m_id, f'Вы выбрали Монобанк\
 , теперь отправьте {price} гривен на {card_num} . После отправкинажмите Проверить',reply_markup=kb.check_kb)
+		data = int(callback_query.data.split()[1]) + 1
+		await bot.edit_message_reply_markup(cb_m_id, data)
 
-@dp.callback_query_handler(lambda c: c.data == 'nal_pay')
+@dp.callback_query_handler(lambda c: c.data.startswith('nal_pay'))
 async def process_callback_nal_pay(callback_query: types.CallbackQuery):
-	await bot.answer_callback_query(callback_query.id)
-	info_mono = db.get_from_db(callback_query.message.chat.id,"mono")
-	info_private = "none"
-	if info_mono == "none":
-		card_num = info_mono
-	else:
-		card_num = info_mono.split()[1]
-	price = db.get_from_db(callback_query.message.chat.id,"price")
-	await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные\
+	cb_m_id = callback_query.message.chat.id
+	if callback_query.data.endswith(str(callback_query.from_user.id)):
+		await bot.answer_callback_query(callback_query.id)
+		info_mono = db.get_from_db(callback_query.message.chat.id,"mono")
+		info_private = "none"
+		if info_mono == "none":
+			card_num = info_mono
+		else:
+			card_num = info_mono.split()[1]
+		price = db.get_from_db(callback_query.message.chat.id,"price")
+		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные\
 , теперь отправьте {price} гривен на {card_num} или на {info_private} подождите после отправки 1 минуту и нажмите Проверить',reply_markup=kb.check_kb)
+		data = int(callback_query.data.split()[1]) + 1
+		await bot.edit_message_reply_markup(cb_m_id, data)
+		kb.check_b.callback_data = "check_pay " + 
 
-@dp.callback_query_handler(lambda c: c.data == 'check_pay')
+@dp.callback_query_handler(lambda c: c.data.startswith('check_pay'))
 async def process_callback_check_pay(callback_query: types.CallbackQuery):
 
-	Test.pay.state.finish()
 
 
 
