@@ -20,7 +20,6 @@ class Test(StatesGroup):
 	price = State()
 	cardprivate = State()
 	cardmono = State()
-	pay = State()
 
 class MyFilter(BoundFilter):
     key = 'is_admin'
@@ -33,9 +32,11 @@ class MyFilter(BoundFilter):
         return member.is_chat_admin()
 
 
-API_TOKEN = '1054227476:AAG-kDMgrPFJAhfU1jT0CCJl8eLiSpIW3RI'
+API_TOKEN = '1054227476:AAFxca-TgwEhtfJlRuVkdBQw4zXF66KZ9eQ'
 logging.basicConfig(level=logging.INFO)
 geolocator = Nominatim(user_agent="tusabot")
+idi = ""
+kik_count = 0
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot,storage=MemoryStorage())
@@ -85,9 +86,6 @@ async def ccardmono_state(message: types.Message, state: FSMContext):
 	await state.finish()
 
 
-@dp.message_handler(state=Test.info)
-async def info_state(message: types.Message, state: FSMContext):
-	await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
 
 @dp.message_handler(is_admin=True,commands=['start', 'help', 'setinfo',
 					'setlocale', 'setdate', 'setprice','setcardinfo','delete'])
@@ -106,6 +104,8 @@ async def send_command(message: types.Message):
 			await message.answer("А теперь отправь информацию о тусовочке!")
 			await Test.info.set()
 		elif message.text.lower() == "/setlocale":
+			kb.inline_btn_1.callback_data = kb.inline_btn_1.callback_data + str(message.from_user.id)
+			kb.inline_btn_2.callback_data = kb.inline_btn_2.callback_data + str(message.from_user.id)
 			await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
 		elif message.text.lower() == "/setdate":
 			await message.answer("А теперь отправь дату тусовочки!\nНапример 17.03")
@@ -133,7 +133,10 @@ async def send_text(message: types.Message):
 		"http"  : os.environ.get('FIXIE_URL', ''), 
 		"https" : os.environ.get('FIXIE_URL', '')}
 	if message.text.lower() == 'погодка':
-		await message.answer(other.pogodka())
+		try:
+			await message.answer(other.pogodka())
+		except:
+			await message.answer("Погодка будет доступна за 5 дней до туссовки.")
 	elif message.text.lower() == '/key':
 		await message.answer("Вот список моих комманд:",reply_markup=kb.markup_key)
 	elif message.text.lower() == 'дата':
@@ -178,26 +181,31 @@ async def send_text(message: types.Message):
 			await message.answer_location(location.latitude, location.longitude)
 	elif message.text.lower() == 'бюджет':
 		try:
-			p_price = privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325","5168745302334229")
+			# p_price = privat_bank(os.getenv('API_PRIVAT2'),proxyDict, "155325","5168745302334229")
 			m_price = banking.mono_bank(m_id)
 			await message.answer("Бюджет тусовочки 💴 💴 💴 : " + m_price)
 		except:
 			await message.answer('Cервер выебываеться попробуйте позже 😔 😔 😔')
 	elif message.text.lower() == 'оплатить':
-		Test.pay.set()
-	elif message.text.lower() == 'ip':
-		rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
-		await message.answer(rer)
+		await message.answer("Выберите способ оплаты :",reply_markup=kb.payment_kb)
+		kb.mono_pay.callback_data = kb.mono_pay.callback_data + message.from_user.id
+		kb.private_pay.callback_data = kb.private_pay.callback_data + message.from_user.id
+		kb.nal_pay.callback_data = kb.nal_pay.callback_data + message.from_user.id
+	# elif message.text.lower() == 'ip':
+	# 	rer = requests.get('https://ramziv.com/ip', proxies=proxyDict).text
+	# 	await message.answer(rer)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'btn1')
+@dp.callback_query_handler(lambda c: c.data.startswith('btn1'))
 async def process_callback_button1(callback_query: types.CallbackQuery):
-		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали координаты\
-, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
-		await Test.locale.set()
+		if callback_query.data.endswith(str(callback_query.from_user.id)):
+			await bot.answer_callback_query(callback_query.id)
+			await bot.send_message(callback_query.message.chat.id, 'Вы выбрали координаты\
+	, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
+			await Test.locale.set()
+			kb.inline_btn_1.callback_data = "btn1"
 
-@dp.callback_query_handler(lambda c: c.data == 'btn2')
+@dp.callback_query_handler(lambda c: c.data.startswith('btn2'))
 async def process_callback_button2(callback_query: types.CallbackQuery):
 		await bot.answer_callback_query(callback_query.id)
 		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали адрес\
@@ -238,11 +246,11 @@ async def process_callback_mono_pay(callback_query: types.CallbackQuery):
 		info = db.get_from_db(callback_query.message.chat.id,"mono")
 		price = db.get_from_db(callback_query.message.chat.id,"price")
 		if info == "none":
-			await bot.send_message(callback_query.message.chat.id,"К сожалению Монобанк не был подключен")
+			await bot.send_message(callback_query.message.chat.id,"К сожалению Монобанк не был подключен",reply_markup=kb.check_kb)
 		else:
 			card_num = info.split()[1]
 			await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Монобанк\
-, теперь отправьте {price} гривен на {card_num} подождите после отправки 1 минуту и нажмите Проверить')
+, теперь отправьте {price} гривен на {card_num} . После отправкинажмите Проверить',reply_markup=kb.check_kb)
 
 @dp.callback_query_handler(lambda c: c.data == 'nal_pay')
 async def process_callback_nal_pay(callback_query: types.CallbackQuery):
@@ -255,11 +263,12 @@ async def process_callback_nal_pay(callback_query: types.CallbackQuery):
 			card_num = info_mono.split()[1]
 		price = db.get_from_db(callback_query.message.chat.id,"price")
 		await bot.send_message(callback_query.message.chat.id, f'Вы выбрали Наличные\
-, теперь отправьте {price} гривен на {card_num} или на {info_private} подождите после отправки 1 минуту и нажмите Проверить')
+, теперь отправьте {price} гривен на {card_num} или на {info_private} подождите после отправки 1 минуту и нажмите Проверить',reply_markup=kb.check_kb)
 
 @dp.callback_query_handler(lambda c: c.data == 'check_pay')
-async def process_callback_nal_pay(callback_query: types.CallbackQuery):
-	
+async def process_callback_check_pay(callback_query: types.CallbackQuery):
+
+	Test.pay.state.finish()
 
 if __name__ == '__main__':
 	db.start_db()
