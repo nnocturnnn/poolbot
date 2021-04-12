@@ -2,8 +2,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, \
     ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 
 inline_kb_variant_addres = InlineKeyboardMarkup(row_width=2)
-inline_btn_1 = InlineKeyboardButton('Координаты', callback_data='btn1')
-inline_btn_2 = InlineKeyboardButton('Адрес', callback_data='btn2')
+inline_btn_1 = InlineKeyboardButton('Координаты')
+inline_btn_2 = InlineKeyboardButton('Адрес')
 inline_kb_variant_addres.add(inline_btn_1, inline_btn_2)
 
 
@@ -34,3 +34,5 @@ markup_key.add(wether,geo,income,info,price,date,be,who_be,dont_be,pay)
 
 check_kb  = InlineKeyboardMarkup()
 check_kb.add(InlineKeyboardButton('Проверить', callback_data='check_pay'))
+
+null_kb  = InlineKeyboardMarkup()

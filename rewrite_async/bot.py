@@ -104,8 +104,8 @@ async def send_command(message: types.Message):
 			await message.answer("А теперь отправь информацию о тусовочке!")
 			await Test.info.set()
 		elif message.text.lower() == "/setlocale":
-			kb.inline_btn_1.callback_data = kb.inline_btn_1.callback_data + str(message.from_user.id)
-			kb.inline_btn_2.callback_data = kb.inline_btn_2.callback_data + str(message.from_user.id)
+			kb.inline_btn_1.callback_data = "btn1 " + str(message.message_id) + " " + str(message.from_user.id)
+			kb.inline_btn_2.callback_data = "btn2 " + str(message.message_id) + " "  + str(message.from_user.id)
 			await message.answer("А теперь выбери формат адреса",reply_markup=kb.inline_kb_variant_addres)
 		elif message.text.lower() == "/setdate":
 			await message.answer("А теперь отправь дату тусовочки!\nНапример 17.03")
@@ -115,6 +115,8 @@ async def send_command(message: types.Message):
 			await Test.price.set()
 		elif message.text.lower() == "/setcardinfo":
 			await message.answer("А теперь выбери свой банк!",reply_markup=kb.bank_kb)
+			kb.mono.callback_data = "monokey " + str(message.message_id) + " " + str(message.from_user.id)
+			kb.private.callback_data = "privatekey " + str(message.message_id) + " "  + str(message.from_user.id)
 		elif message.text.lower().startswith("/delete"):
 			str_to_db = db.get_from_db(str(message.chat.id),"list_user")
 			user = message.text.split()[1]
@@ -198,19 +200,26 @@ async def send_text(message: types.Message):
 
 @dp.callback_query_handler(lambda c: c.data.startswith('btn1'))
 async def process_callback_button1(callback_query: types.CallbackQuery):
+		cb_m_id = callback_query.message.chat.id
 		if callback_query.data.endswith(str(callback_query.from_user.id)):
 			await bot.answer_callback_query(callback_query.id)
-			await bot.send_message(callback_query.message.chat.id, 'Вы выбрали координаты\
-	, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
+			await bot.send_message(cb_m_id, 'Вы выбрали координаты\
+, теперь отправьте lontitude latitude\nНапример 50.32434 47.32443')
 			await Test.locale.set()
-			kb.inline_btn_1.callback_data = "btn1"
+			data = int(callback_query.data.split()[1]) + 1
+			await bot.edit_message_reply_markup(cb_m_id, data)
+			
 
 @dp.callback_query_handler(lambda c: c.data.startswith('btn2'))
 async def process_callback_button2(callback_query: types.CallbackQuery):
-		await bot.answer_callback_query(callback_query.id)
-		await bot.send_message(callback_query.message.chat.id, 'Вы выбрали адрес\
-, теперь отправьте адрес\nНапример Киев Хрещатик 4')
-		await Test.locale.set()
+		cb_m_id = callback_query.message.chat.id
+		if callback_query.data.endswith(str(callback_query.from_user.id)):
+			await bot.answer_callback_query(callback_query.id)
+			await bot.send_message(cb_m_id, 'Вы выбрали адрес, теперь \
+отправьте адрес\nНапример Киев Хрещатик 4')
+			await Test.locale.set()
+			data = int(callback_query.data.split()[1]) + 1
+			await bot.edit_message_reply_markup(cb_m_id, data)
 
 @dp.callback_query_handler(lambda c: c.data == 'monokey')
 async def process_callback_mono(callback_query: types.CallbackQuery):
