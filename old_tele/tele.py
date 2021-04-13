@@ -11,7 +11,6 @@ from requests import post
 from geopy.geocoders import Nominatim
 from telebot import apihelper
 from scipy import spatial
-from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import json
 
