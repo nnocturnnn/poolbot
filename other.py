@@ -2,6 +2,7 @@ from pyowm import OWM
 from datetime import datetime
 from pyowm.utils.config import get_default_config
 import db
+import os
 
 config_dict = get_default_config()
 config_dict['language'] = 'ru'
