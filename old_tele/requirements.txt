@@ -1,4 +1,4 @@
-lxml==4.4.2
+lxml==4.6.3
 geopy==1.20.0
 pyowm==2.10.0
 pyTelegramBotAPI==3.6.6
