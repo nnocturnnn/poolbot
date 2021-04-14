@@ -7,7 +7,7 @@ def start_db():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS users(
-                chat_id INT PRIMARY KEY,
+                chat_id BIGINT PRIMARY KEY,
                 locale TEXT,
                 info TEXT,
                 list_user TEXT,
