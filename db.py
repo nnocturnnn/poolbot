@@ -1,7 +1,10 @@
-import sqlite3
+import psycopg2
+import os
+
+DATABASE_URL = os.environ['DATABASE_URL']
 
 def start_db():
-    conn = sqlite3.connect('bots.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS users(
                 chat_id INT PRIMARY KEY,
@@ -18,7 +21,7 @@ def start_db():
 
 def insert_db(chat_id,locale="none",info="none",list_user="none",
                 date="none",price="none",private="none",mono="none"):
-    conn = sqlite3.connect('bots.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     if locale == "none" and info == "none" and list_user == "none" and \
         date == "none" and price == "none" and private == "none" and mono == "none":
@@ -48,7 +51,7 @@ def insert_db(chat_id,locale="none",info="none",list_user="none",
     conn.commit()
 
 def get_from_db(chat_id,message):
-    conn = sqlite3.connect('bots.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     if message == "info":
         sql = """SELECT info FROM users WHERE chat_id = ?"""

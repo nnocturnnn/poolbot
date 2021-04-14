@@ -3,5 +3,4 @@ pyowm==3.2.0
 geopy==2.1.0
 aiogram==2.11.2
 monobank==0.4.4
-# lxml==4.4.2
-# scipy==1.4.1
+psycopg2-binary==2.8.6
